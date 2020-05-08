@@ -7,9 +7,15 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.dnz.inc.bingwallpaper.fragments.MainFragment;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private Fragment mainFragment, displayImageFragment;
+    public static Map<Integer, Object> imageMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,5 +35,6 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, mainFragment)
                     .commit();
         }
+
     }
 }

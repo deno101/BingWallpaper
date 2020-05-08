@@ -1,4 +1,4 @@
-package com.dnz.inc.bingwallpaper;
+package com.dnz.inc.bingwallpaper.fragments;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,14 +6,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.dnz.inc.bingwallpaper.MainActivity;
+import com.dnz.inc.bingwallpaper.R;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<RecyclerAdapterForMainFragment.CardVieHolder> {
-
 
 
     public RecyclerAdapterForMainFragment() {
@@ -36,10 +36,10 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
     @Override
     public int getItemCount() {
-        return 10;
+        return MainActivity.imageMap.size();
     }
 
-    public class CardVieHolder extends RecyclerView.ViewHolder{
+    public class CardVieHolder extends RecyclerView.ViewHolder {
 
         public CardView cardContainer;
         public ImageView bingImage, favorites;
