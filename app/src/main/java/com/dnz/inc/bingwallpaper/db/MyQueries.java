@@ -5,10 +5,10 @@ import com.dnz.inc.bingwallpaper.db.ContractSchema.ImageDataTable;
 public class MyQueries {
 
     public static final String CREATE_QUERY_IMAGE_TABLE = String.format("" +
-            "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT," +
-            "%s TEXT, %s TEXT, %s TEXT)",
+                    "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT," +
+                    " %s TEXT, %s TEXT)",
             ImageDataTable.TABLE_NAME, ImageDataTable._ID, ImageDataTable.COLUMN_TITLE,
-            ImageDataTable.COLUMN_D_C, ImageDataTable.COLUMN_PATH, ImageDataTable.COLUMN_EXP_DATE,
+            ImageDataTable.COLUMN_D_C,
             ImageDataTable.COLUMN_IS_FAVORITE);
 
     public static final String DROP_TABLE_QUERY =

@@ -17,7 +17,6 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "image_data.db";
 
     public DBHelper(Context context) {
-
         super(context, DB_NAME, null, DB_VERSION);
     }
 
@@ -28,18 +27,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL(MyQueries.CREATE_QUERY_IMAGE_TABLE);
+        sqLiteDatabase.execSQL(MyQueries.DROP_TABLE_QUERY);
         onCreate(sqLiteDatabase);
     }
 
-    public void insertData(String title, String d_c, String path, String exp_date, String is_favorites) {
+    public synchronized void insertData(String title, String d_c, String is_favorites) {
         ContentValues contentValues = new ContentValues();
 
-        // TODO: do this task dynamically using ImageDataTable.COLUMNS[]
         contentValues.put(ImageDataTable.COLUMN_TITLE, title);
         contentValues.put(ImageDataTable.COLUMN_D_C, d_c);
-        contentValues.put(ImageDataTable.COLUMN_PATH, path);
-        contentValues.put(ImageDataTable.COLUMN_EXP_DATE, exp_date);
         contentValues.put(ImageDataTable.COLUMN_IS_FAVORITE, is_favorites);
 
         getWritableDatabase().insert(ImageDataTable.TABLE_NAME, null, contentValues);
@@ -50,6 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (cursor.getCount() == 0){
             // Todo: get 10 images from bing
+            return;
         }
         int i = 0;
         while (cursor.moveToNext()){
@@ -61,5 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
             // TODO: notify Adapter item inserted
             i++;
         }
+
+        cursor.close();
     }
 }
