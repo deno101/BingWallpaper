@@ -5,8 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.db.ContractSchema.ImageDataTable;
 
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import java.util.Map;
 public class DBHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
     private static final String DB_NAME = "image_data.db";
+    private static final String TAG = "DBHelper";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -41,24 +42,31 @@ public class DBHelper extends SQLiteOpenHelper {
         getWritableDatabase().insert(ImageDataTable.TABLE_NAME, null, contentValues);
     }
 
-    public void SelectAll(){
+    public Map SelectAll() {
         Cursor cursor = getWritableDatabase().rawQuery(MyQueries.SELECT_ALL_QUERY, null);
+        Map temp = new HashMap();
 
-        if (cursor.getCount() == 0){
+        if (cursor.getCount() == 0) {
             // Todo: get 10 images from bing
-            return;
+            return new HashMap<>();
         }
         int i = 0;
-        while (cursor.moveToNext()){
-            Map<String, Object> map = new HashMap<>();
-            for (String columnName : ImageDataTable.COLUMNS){
+        while (cursor.moveToNext()) {
+            Map<String, String> map = new HashMap<>();
+            for (String columnName : ImageDataTable.COLUMNS) {
+                Log.d(TAG, "SelectAll: " + columnName);
+                String value = cursor.getString(cursor.getColumnIndex(columnName));
+
+                Log.d(TAG, "SelectAll: value "+ value);
+                Log.d(TAG, "SelectAll: column index "+cursor.getColumnIndex(columnName));
                 map.put(columnName, cursor.getString(cursor.getColumnIndex(columnName)));
             }
-            MainActivity.imageMap.put(i, map);
-            // TODO: notify Adapter item inserted
+
+            temp.put(i, map);
             i++;
         }
 
         cursor.close();
+        return temp;
     }
 }

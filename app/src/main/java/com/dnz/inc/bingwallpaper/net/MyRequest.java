@@ -2,7 +2,6 @@ package com.dnz.inc.bingwallpaper.net;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Environment;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -15,9 +14,6 @@ import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.util.UUID;
 
 public class MyRequest {
 
@@ -59,7 +55,7 @@ public class MyRequest {
                 new MyImageResponseListener(imageDate){
                     @Override
                     public void onResponse(Bitmap response) {
-                        FileUtils.saveDataToFile(response, context.getFilesDir(), imageDate+".jpg");
+                        FileUtils.saveImageToFile(response, context.getFilesDir(), imageDate+".jpg");
                     }
                 }, 1024, 1024, null,
                 new Response.ErrorListener() {

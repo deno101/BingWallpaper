@@ -29,14 +29,14 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(@NonNull CardVieHolder holder, int position) {
-        holder.bingImage.setImageResource(R.drawable.two_male_lion);
-        holder.imageDescription.setText("kjdvfiuvjkfevnieurvbhjefviuhjkavnljhdvb jd lhbjclauy awcbougvyb auydcgbaoweuvyb");
-        holder.pictureDate.setText("10-Sep-2019");
+        holder.bingImage.setImageBitmap(MainFragment.dataStore.getBitmap(position));
+        holder.imageDescription.setText(MainFragment.dataStore.getTitle(position));
+        holder.pictureDate.setText(MainFragment.dataStore.getDate(position));
     }
 
     @Override
     public int getItemCount() {
-        return MainActivity.imageMap.size();
+        return MainFragment.dataStore.length();
     }
 
     public class CardVieHolder extends RecyclerView.ViewHolder {

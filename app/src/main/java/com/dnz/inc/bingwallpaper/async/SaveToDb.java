@@ -16,8 +16,8 @@ public class SaveToDb extends AsyncTask<String, Void, Void> {
         if (data.length != 2){
             throw new IllegalArgumentException("thread takes exactly three arguments");
         }
-        String imagedate = data[0];
-        String title = data[1];
+        String imagedate = data[1];
+        String title = data[0];
 
         dbHelper.insertData(title, imagedate, "0");
         return null;

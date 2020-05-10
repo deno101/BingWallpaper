@@ -25,7 +25,11 @@
         <service
             android:name=".UpdateService"
             android:description="@string/update_service_desc"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.dnz.inc.bingwallpaper.UPDATE_SERVICE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

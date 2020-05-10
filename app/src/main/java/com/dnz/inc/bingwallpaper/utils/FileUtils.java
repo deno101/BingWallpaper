@@ -1,15 +1,17 @@
 package com.dnz.inc.bingwallpaper.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileUtils {
 
-    public static void saveDataToFile(Bitmap image, File dir, String fileName){
+    public static void saveImageToFile(Bitmap image, File dir, String fileName){
         File file = new File(dir, fileName);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -25,10 +27,23 @@ public class FileUtils {
             }
 
             if (bool){
-                saveDataToFile(image, dir, fileName);
+                saveImageToFile(image, dir, fileName);
             }else {
                 throw new IllegalStateException("Failed to create image file");
             }
         }
+    }
+
+    public static Bitmap readImage(File path, String filename){
+        path = new File(path, filename+".jpg");
+        Bitmap image = null;
+        try {
+            FileInputStream fin  = new FileInputStream(path);
+            image = BitmapFactory.decodeStream(fin);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return image;
     }
 }
