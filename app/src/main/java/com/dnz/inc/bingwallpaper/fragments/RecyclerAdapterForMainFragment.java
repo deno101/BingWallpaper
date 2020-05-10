@@ -1,5 +1,6 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<RecyclerAdapterForMainFragment.CardVieHolder> {
-
+    private static final String TAG = "RecyclerAdapterForMainF";
 
     public RecyclerAdapterForMainFragment() {
 
@@ -29,6 +30,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(@NonNull CardVieHolder holder, int position) {
+        Log.d(TAG, "onBindViewHolder: Creating object at index "+ position);
         holder.bingImage.setImageBitmap(MainFragment.dataStore.getBitmap(position));
         holder.imageDescription.setText(MainFragment.dataStore.getTitle(position));
         holder.pictureDate.setText(MainFragment.dataStore.getDate(position));
@@ -54,5 +56,9 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
             pictureDate = itemView.findViewById(R.id.card_text_view_for_date);
             imageDescription = itemView.findViewById(R.id.card_text_view_for_image_desc);
         }
+    }
+
+    public  synchronized void insertItem(int position){
+        notifyItemInserted(position);
     }
 }

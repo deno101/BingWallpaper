@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         //startService(intent);
 
         setAlarm();
-        ((MainFragment) mainFragment).getDataFromDB(getApplicationContext());
     }
 
     private void setAlarm() {

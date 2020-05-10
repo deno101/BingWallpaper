@@ -50,21 +50,27 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         // Initialize all recycler views
         recyclerView = getActivity().findViewById(R.id.recycler_view_main_fragment);
         adapter = new RecyclerAdapterForMainFragment();
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager layoutManager = new MyLinearLayoutManager(getActivity());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
-
     }
 
-    public void getDataFromDB(Context context) {
+
+    private void getDataFromDB(Context context) {
         new MyAsyncTask(context).execute();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDataFromDB(getActivity());
     }
 
     private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -107,19 +113,36 @@ public class MainFragment extends Fragment {
 
                 dataStore.insertData(image, dateInFormat, bool, title, i);
 
-                Log.d(TAG, "doInBackground: string at i" + dataStore.getTitle(i));
                 final Integer i2 = i;
-                Log.d(TAG, "doInBackground: value of i " + i);
-                if (recyclerView == null)continue;;
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 recyclerView.post(new Runnable() {
                     @Override
                     public void run() {
-                        Log.e(TAG, "run: index " + i2);
-                        adapter.notifyDataSetChanged();
+                        adapter.notifyItemInserted(i2);
                     }
                 });
             }
             return null;
+        }
+    }
+
+    private class MyLinearLayoutManager extends LinearLayoutManager{
+
+        public MyLinearLayoutManager(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+            try {
+                super.onLayoutChildren(recycler, state);
+            }catch (IndexOutOfBoundsException e){
+                e.printStackTrace();
+            }
         }
     }
 
