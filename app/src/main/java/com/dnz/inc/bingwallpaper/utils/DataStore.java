@@ -2,41 +2,53 @@ package com.dnz.inc.bingwallpaper.utils;
 
 import android.graphics.Bitmap;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class DataStore {
 
-    private Map<Integer, Bitmap> bitmapMap = new HashMap<>();
-    private Map<Integer, String> dateMap = new HashMap<>();
-    private Map<Integer, Boolean> booleanMap = new HashMap<>();
-    private Map<Integer, String> titleMap = new HashMap<>();
+    private Bitmap image;
+    private String date;
+    private String title;
+    private boolean bool;
+    private String fullCopyright;
+    private String copyright;
 
-    public synchronized void insertData(Bitmap bitmap, String date, Boolean isFavorite,
-                                        String title, int position){
+    public DataStore(Bitmap image, String date, String fullCopyright, boolean bool) {
+        this.image = image;
+        this.date = date;
+        this.fullCopyright = fullCopyright;
+        this.bool = bool;
 
-        bitmapMap.put(position, bitmap);
-        dateMap.put(position, date);
-        booleanMap.put(position, isFavorite);
-        titleMap.put(position, title);
+        setTitle();
     }
 
-    public Bitmap getBitmap(int position){
-        return bitmapMap.get(position);
+
+
+    private void setTitle(){
+        fullCopyright = fullCopyright.trim();
+        String[] temp = fullCopyright.split("\\(|\\)");
+
+        title = temp[0];
+        copyright = temp[temp.length -1];
+
     }
 
-    public String getDate(int position){
-        return dateMap.get(position);
+    public Bitmap getBitmap() {
+        return image;
     }
 
-    public Boolean getBoolean(int position){
-        return booleanMap.get(position);
+    public String getDate() {
+        return date;
     }
 
-    public int length(){
-        return booleanMap.size();
+    public String getTitle() {
+        return title;
     }
-    public String getTitle(int position){
-        return titleMap.get(position);
+
+    public String getCopyright() {
+        return copyright;
+    }
+
+    public boolean getBool() {
+        return bool;
     }
 }

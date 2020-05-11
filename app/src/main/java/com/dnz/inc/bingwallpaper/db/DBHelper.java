@@ -42,31 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
         getWritableDatabase().insert(ImageDataTable.TABLE_NAME, null, contentValues);
     }
 
-    public Map SelectAll() {
-        Cursor cursor = getWritableDatabase().rawQuery(MyQueries.SELECT_ALL_QUERY, null);
-        Map temp = new HashMap();
-
-        if (cursor.getCount() == 0) {
-            // Todo: get 10 images from bing
-            return new HashMap<>();
-        }
-        int i = 0;
-        while (cursor.moveToNext()) {
-            Map<String, String> map = new HashMap<>();
-            for (String columnName : ImageDataTable.COLUMNS) {
-                Log.d(TAG, "SelectAll: " + columnName);
-                String value = cursor.getString(cursor.getColumnIndex(columnName));
-
-                Log.d(TAG, "SelectAll: value "+ value);
-                Log.d(TAG, "SelectAll: column index "+cursor.getColumnIndex(columnName));
-                map.put(columnName, cursor.getString(cursor.getColumnIndex(columnName)));
-            }
-
-            temp.put(i, map);
-            i++;
-        }
-
-        cursor.close();
-        return temp;
+    public Cursor SelectAll() {
+        return getWritableDatabase().rawQuery(MyQueries.SELECT_ALL_QUERY, null);
     }
 }

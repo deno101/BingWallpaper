@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.R;
+import com.dnz.inc.bingwallpaper.utils.DataStore;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -16,9 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<RecyclerAdapterForMainFragment.CardVieHolder> {
     private static final String TAG = "RecyclerAdapterForMainF";
+    private MainFragment mainFragment;
 
-    public RecyclerAdapterForMainFragment() {
-
+    public RecyclerAdapterForMainFragment(MainFragment fragment) {
+        this.mainFragment = fragment;
     }
 
     @NonNull
@@ -30,15 +32,16 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(@NonNull CardVieHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: Creating object at index "+ position);
-        holder.bingImage.setImageBitmap(MainFragment.dataStore.getBitmap(position));
-        holder.imageDescription.setText(MainFragment.dataStore.getTitle(position));
-        holder.pictureDate.setText(MainFragment.dataStore.getDate(position));
+        DataStore dataStore = mainFragment.dataList.get(position);
+
+        holder.bingImage.setImageBitmap(dataStore.getBitmap());
+        holder.imageDescription.setText(dataStore.getTitle());
+        holder.pictureDate.setText(dataStore.getDate());
     }
 
     @Override
     public int getItemCount() {
-        return MainFragment.dataStore.length();
+        return mainFragment.dataList.size();
     }
 
     public class CardVieHolder extends RecyclerView.ViewHolder {
