@@ -161,7 +161,14 @@ public class MainFragment extends Fragment {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
 
+            Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
+            intent.setPackage(getActivity().getPackageName());
+
+            getActivity().startService(intent);
+        }
     }
 
     private class MyLinearLayoutManager extends LinearLayoutManager {
