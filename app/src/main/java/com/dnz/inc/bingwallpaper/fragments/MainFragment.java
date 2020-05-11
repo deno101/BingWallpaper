@@ -11,6 +11,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,30 +59,22 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new RecyclerAdapterForMainFragment(this);
-        layoutManager = new MyLinearLayoutManager(getActivity());
+
+        getLifecycle().addObserver(new MyLifeCycleObserver());
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // Initialize all recycler views
-        recyclerView = getActivity().findViewById(R.id.recycler_view_main_fragment);
-
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(layoutManager);
-    }
-
-
-    private void getDataFromDB(Context context) {
-        new MyAsyncTask(context).execute();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        getDataFromDB(getActivity());
+    }
+
+    private void createRecyclerView() {
+        new MyAsyncTask(getActivity()).execute();
     }
 
     private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -95,11 +90,31 @@ public class MainFragment extends Fragment {
 
             Cursor cursor = dbHelper.SelectAll();
 
-            if (cursor.getCount() == 0){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+            recyclerView = ((Activity) context).findViewById(R.id.recycler_view_main_fragment);
+            adapter = new RecyclerAdapterForMainFragment(MainFragment.this);
+
+            layoutManager = new MyLinearLayoutManager(getActivity());
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(layoutManager);
+                }
+            });
+
+
+            if (cursor.getCount() == 0) {
                 return null;
             }
             int i = 0;
-            while(cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
 
                 boolean bool = false;
 
@@ -132,7 +147,7 @@ public class MainFragment extends Fragment {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                recyclerView.post(new MyRunnable(i) {
+                ((Activity) context).runOnUiThread(new MyRunnable(i) {
                     @Override
                     public void run() {
                         adapter.notifyItemInserted(this.updateIndex);
@@ -149,7 +164,7 @@ public class MainFragment extends Fragment {
 
     }
 
-    private class MyLinearLayoutManager extends LinearLayoutManager{
+    private class MyLinearLayoutManager extends LinearLayoutManager {
 
         public MyLinearLayoutManager(Context context) {
             super(context);
@@ -159,13 +174,13 @@ public class MainFragment extends Fragment {
         public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
             try {
                 super.onLayoutChildren(recycler, state);
-            }catch (IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private abstract class  MyRunnable implements Runnable{
+    private abstract class MyRunnable implements Runnable {
         public int updateIndex;
 
         public MyRunnable(int updateIndex) {
@@ -173,4 +188,15 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private class MyLifeCycleObserver implements LifecycleEventObserver {
+
+        @Override
+        public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+            Lifecycle.State currentState = source.getLifecycle().getCurrentState();
+
+            if (currentState == Lifecycle.State.STARTED && event != Lifecycle.Event.ON_PAUSE) {
+                createRecyclerView();
+            }
+        }
+    }
 }
