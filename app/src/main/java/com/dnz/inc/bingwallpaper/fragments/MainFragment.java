@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class MainFragment extends Fragment {
     private static final String TAG = "MainFragment";
-    public ArrayList<DataStore> dataList = new ArrayList<>();
+    public ArrayList<DataStore> dataList;
     private RecyclerAdapterForMainFragment adapter;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -90,6 +90,7 @@ public class MainFragment extends Fragment {
 
             Cursor cursor = dbHelper.SelectAll();
 
+            dataList = new ArrayList<>();
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {

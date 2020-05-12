@@ -28,7 +28,6 @@ public class UpdateService extends Service {
 
         if (dataInDB == null){
             dataInDB = new ArrayList<>();
-            // todo: get data from db and populate dataInDB
             DBHelper dbHelper = new DBHelper(this);
 
             Cursor cursor = dbHelper.SelectAll();

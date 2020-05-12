@@ -83,10 +83,4 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
                 .addToBackStack(null)
                 .commit();
     }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG, "onTouchEvent: "+ event.toString());
-        return super.onTouchEvent(event);
-    }
 }

@@ -1,12 +1,7 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.GestureDetectorCompat;
-import androidx.core.view.MotionEventCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -25,6 +20,7 @@ import com.dnz.inc.bingwallpaper.R;
  */
 public class ImageFragment extends Fragment {
     private static final String TAG = "ImageFragment";
+    private GestureDetector mDetector;
 
     public ImageFragment() {
 
@@ -37,51 +33,31 @@ public class ImageFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_image, container, false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onStart() {
         super.onStart();
+        ImageView imageView = getActivity().findViewById(R.id.main_image_for_im_fragment);
 
-        ImageView layout = getActivity().findViewById(R.id.main_image_for_im_fragment);
-        GestureDetectorCompat detectorCompat = new GestureDetectorCompat(getContext(), new GestureDetector());
-
+        if (mDetector == null){
+            mDetector= new GestureDetector(getContext(), new MyGestureListener());
+            imageView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    Log.d(TAG, "onTouch: fired");
+                    mDetector.onTouchEvent(motionEvent);
+                    return true;
+                }
+            });
+        }
 
     }
 
-
-    private class GestureDetector implements android.view.GestureDetector.OnGestureListener{
-
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
         @Override
-        public boolean onDown(MotionEvent motionEvent) {
-            Log.d(TAG, "onDown:");
-            return false;
-        }
-
-        @Override
-        public void onShowPress(MotionEvent motionEvent) {
-
-        }
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent motionEvent) {
-            Log.d(TAG, "onSingleTapUp:");
-            return false;
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-            Log.d(TAG, "onScroll: ");
-            return false;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent motionEvent) {
-
-        }
-
-        @Override
-        public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-            return false;
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.d(TAG, "onScroll: scroll" + distanceY);
+            //TOdo: register view changes.
+            return super.onScroll(e1, e2, distanceX, distanceY);
         }
     }
 }
