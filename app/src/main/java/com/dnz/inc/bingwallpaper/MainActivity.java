@@ -11,9 +11,10 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
-import com.dnz.inc.bingwallpaper.fragments.MainFragment;
+import com.dnz.inc.bingwallpaper.fragments.ImageFragment;
 import com.dnz.inc.bingwallpaper.net.CallBacks;
 
 import java.util.Calendar;
@@ -39,16 +40,16 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
 
         Log.d(TAG, "onCreate: deviceWidthPixels" + deviceWidthPixels);
 
-        mainFragment = new MainFragment();
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, mainFragment)
-                    .commit();
-        }
+//        mainFragment = new MainFragment();
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.fragment_container, mainFragment)
+//                    .commit();
+//        }
 
-        //startService(intent);
+        startImageFragment(null, null, null);
 
-        setAlarm();
+       // setAlarm();
     }
 
     private void setAlarm() {
@@ -81,5 +82,11 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
                 .replace(R.id.fragment_container, displayImageFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "onTouchEvent: "+ event.toString());
+        return super.onTouchEvent(event);
     }
 }
