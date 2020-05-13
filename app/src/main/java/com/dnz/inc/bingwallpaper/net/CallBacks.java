@@ -8,6 +8,6 @@ public class CallBacks {
     }
 
     public interface StartFragment{
-        void startImageFragment(Bitmap image, String copyright, String title);
+        void startImageFragment(Bitmap image, String copyright, String title, String date);
     }
 }

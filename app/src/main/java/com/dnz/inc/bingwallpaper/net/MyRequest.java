@@ -78,7 +78,7 @@ public class MyRequest {
                         String copright = splited[1];
 
                         if (MainActivity.startFragment != null){
-                            MainActivity.startFragment.startImageFragment(response, copright, title);
+                            MainActivity.startFragment.startImageFragment(response, copright, title, imageDate);
                         }
                     }
                 }, 1024, 1024, null,

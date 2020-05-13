@@ -59,18 +59,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getLifecycle().addObserver(new MyLifeCycleObserver());
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     private void createRecyclerView() {
@@ -203,6 +192,7 @@ public class MainFragment extends Fragment {
             Lifecycle.State currentState = source.getLifecycle().getCurrentState();
 
             if (currentState == Lifecycle.State.STARTED && event != Lifecycle.Event.ON_PAUSE) {
+                dataList = new ArrayList<>();
                 createRecyclerView();
             }
         }

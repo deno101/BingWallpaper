@@ -1,5 +1,7 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +60,20 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
             favorites = itemView.findViewById(R.id.card_image_view_for_favorites);
             pictureDate = itemView.findViewById(R.id.card_text_view_for_date);
             imageDescription = itemView.findViewById(R.id.card_text_view_for_image_desc);
+
+            cardContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String date = pictureDate.getText().toString();
+                    String imageDesc = imageDescription.getText().toString();
+
+                    Bitmap bitmap = ( (BitmapDrawable) bingImage.getDrawable()).getBitmap();
+
+                    if (MainActivity.startFragment != null){
+                        MainActivity.startFragment.startImageFragment(bitmap,null,imageDesc, date);
+                    }
+                }
+            });
         }
     }
 

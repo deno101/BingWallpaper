@@ -11,15 +11,15 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.dnz.inc.bingwallpaper.fragments.ImageFragment;
+import com.dnz.inc.bingwallpaper.fragments.MainFragment;
 import com.dnz.inc.bingwallpaper.net.CallBacks;
 
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements CallBacks.StartFragment{
+public class MainActivity extends AppCompatActivity implements CallBacks.StartFragment {
     private static final String TAG = "MainActivity";
     private Fragment mainFragment, displayImageFragment;
 
@@ -40,16 +40,14 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
 
         Log.d(TAG, "onCreate: deviceWidthPixels" + deviceWidthPixels);
 
-//        mainFragment = new MainFragment();
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.fragment_container, mainFragment)
-//                    .commit();
-//        }
+        mainFragment = new MainFragment();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, mainFragment)
+                    .commit();
+        }
 
-        startImageFragment(null, null, null);
-
-       // setAlarm();
+        setAlarm();
     }
 
     private void setAlarm() {
@@ -59,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0,
                 intent, PendingIntent.FLAG_NO_CREATE);
 
-        if (pendingIntent == null){
+        if (pendingIntent == null) {
             return;
         }
 
@@ -75,8 +73,8 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     }
 
     @Override
-    public void startImageFragment(Bitmap image, String copyright, String title) {
-        displayImageFragment = new ImageFragment();
+    public void startImageFragment(Bitmap image, String copyright, String title, String date) {
+        displayImageFragment = new ImageFragment(image, copyright, title, date);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, displayImageFragment)
