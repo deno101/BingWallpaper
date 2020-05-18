@@ -1,15 +1,19 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -36,6 +40,10 @@ public class ImageFragment extends Fragment {
 
     private Bitmap bitmap;
     private String copyright, title, date;
+    private ConstraintSet l_one = new ConstraintSet();
+    private ConstraintSet l_two = new ConstraintSet();
+
+    private ConstraintLayout mContainer;
 
 
     public ImageFragment(Bitmap bitmap, String copyright, String title, String date) {
@@ -48,33 +56,37 @@ public class ImageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_image, container, false);
+        return mContainer =
+                (ConstraintLayout) inflater.inflate(R.layout.fragment_image, container, false);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.getLifecycle().addObserver(new MyListener());
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
         initializeUI();
+        Log.d(TAG, "onStart: mcontainet." + mContainer.getId());
+        l_one.clone(mContainer);
+        l_two.clone(getContext(), R.layout.fragment_image_2);
     }
 
-    private void initializeUI(){
-        ImageView imageView = getActivity().findViewById(R.id.main_image_for_im_fragment);
+    private void initializeUI() {
 
         Log.d(TAG, "initializeUI: ");
-        
-        if (mDetector == null){
-            mDetector= new GestureDetector(getContext(), new MyGestureListener());
-            imageView.setOnTouchListener(new View.OnTouchListener() {
+
+        if (mDetector == null) {
+            mDetector = new GestureDetector(getContext(), new MyGestureListener());
+            mContainer.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
-                    Log.d(TAG, "onTouch: fired");
-                    return true || mDetector.onTouchEvent(motionEvent);
+                    mDetector.onTouchEvent(motionEvent);
+                    return true;
                 }
             });
         }
@@ -92,7 +104,7 @@ public class ImageFragment extends Fragment {
                 mDate = dateFormat2.parse(date);
             } catch (ParseException ex) {
                 ex.printStackTrace();
-                throw  new IllegalArgumentException("invalid date supplied");
+                throw new IllegalArgumentException("invalid date supplied");
             }
         }
 
@@ -102,27 +114,34 @@ public class ImageFragment extends Fragment {
                 findViewById(R.id.image_date_im_fragment)).setText(str);
         ((ImageView) getActivity().
                 findViewById(R.id.main_image_for_im_fragment)).setImageBitmap(bitmap);
+        ((TextView) getActivity().
+                findViewById(R.id.description_text_view)).setText(title);
+        ((TextView) getActivity().
+                findViewById(R.id.copyright_text_view)).setText(copyright);
 
     }
 
-    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.d(TAG, "onScroll: scroll" + distanceY);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                TransitionManager.beginDelayedTransition(mContainer);
+            }
+            if (distanceY > 0 ) {
+                l_two.applyTo(mContainer);
+            } else if (distanceY < 0) {
+                l_one.applyTo(mContainer);
+            }
+
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
     }
 
-    private class MyListener implements LifecycleEventObserver{
+    private class MyListener implements LifecycleEventObserver {
 
         @Override
         public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
 
-            Lifecycle.State state = source.getLifecycle().getCurrentState();
-            Log.d(TAG, "onStateChanged: "+ state +"  "+event);
-            if (event == Lifecycle.Event.ON_START){
-                //initializeUI();
-            }
         }
     }
 }

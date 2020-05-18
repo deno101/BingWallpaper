@@ -58,14 +58,12 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         if (liveData != null) {
-            Log.d(TAG, "onCreateView: restoring");
             return mContainer;
         } else {
             mContainer = inflater.inflate(R.layout.fragment_main, container, false);
             recyclerView = mContainer.findViewById(R.id.recycler_view_main_fragment);
             progressBar = mContainer.findViewById(R.id.progress_main_fragment);
 
-            Log.d(TAG, "onCreateView: else block");
             createRecyclerView();
         }
         return mContainer;
@@ -83,7 +81,6 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.d(TAG, "onSaveInstanceState: saving");
         super.onSaveInstanceState(outState);
     }
 
@@ -218,7 +215,6 @@ public class MainFragment extends Fragment {
         public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
             Lifecycle.State currentState = source.getLifecycle().getCurrentState();
 
-            Log.d(TAG, "onStateChanged: state " + currentState + " event " + event);
 
             if (currentState == Lifecycle.State.STARTED && event == Lifecycle.Event.ON_CREATE) {
                 createRecyclerView();

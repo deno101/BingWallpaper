@@ -39,6 +39,8 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         holder.bingImage.setImageBitmap(dataStore.getBitmap());
         holder.imageDescription.setText(dataStore.getTitle());
         holder.pictureDate.setText(dataStore.getDate());
+        holder.copyright.setText(dataStore.getCopyright());
+
     }
 
     @Override
@@ -50,7 +52,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
         public CardView cardContainer;
         public ImageView bingImage, favorites;
-        public TextView pictureDate, imageDescription;
+        public TextView pictureDate, imageDescription, copyright;
 
         public CardVieHolder(@NonNull View itemView) {
             super(itemView);
@@ -60,17 +62,18 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
             favorites = itemView.findViewById(R.id.card_image_view_for_favorites);
             pictureDate = itemView.findViewById(R.id.card_text_view_for_date);
             imageDescription = itemView.findViewById(R.id.card_text_view_for_image_desc);
+            copyright = itemView.findViewById(R.id.copyright_for_image);
 
             cardContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String date = pictureDate.getText().toString();
                     String imageDesc = imageDescription.getText().toString();
-
+                    String copyright_msg = copyright.getText().toString();
                     Bitmap bitmap = ( (BitmapDrawable) bingImage.getDrawable()).getBitmap();
 
                     if (MainActivity.startFragment != null){
-                        MainActivity.startFragment.startImageFragment(bitmap,null,imageDesc, date);
+                        MainActivity.startFragment.startImageFragment(bitmap,copyright_msg,imageDesc, date);
                     }
                 }
             });
