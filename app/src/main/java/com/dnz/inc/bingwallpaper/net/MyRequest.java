@@ -9,7 +9,6 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.UpdateService;
-import com.dnz.inc.bingwallpaper.async.SaveToDb;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
 
@@ -78,7 +77,11 @@ public class MyRequest {
                         String copright = splited[1];
 
                         if (MainActivity.startFragment != null){
-                            MainActivity.startFragment.startImageFragment(response, copright, title, imageDate);
+                            try {
+                                MainActivity.startFragment.startImageFragment(response, copright, title, imageDate);
+                            }catch (IllegalStateException e){
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }, 1024, 1024, null,

@@ -78,6 +78,9 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
     }
 
     public  synchronized void insertItem(int position){
+        if (mainFragment.progressBar != null){
+            mainFragment.progressBar.setVisibility(View.INVISIBLE);
+        }
         notifyItemInserted(position);
     }
 }

@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.dnz.inc.bingwallpaper.R;
 import com.dnz.inc.bingwallpaper.db.ContractSchema;
@@ -31,10 +32,7 @@ import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 
 /**
@@ -46,6 +44,11 @@ public class MainFragment extends Fragment {
     private RecyclerAdapterForMainFragment adapter;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
+    private View mContainer;
+
+    private Bundle liveData;
+
+    public ProgressBar progressBar;
 
     public MainFragment() {
 
@@ -53,17 +56,42 @@ public class MainFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+
+        if (liveData != null) {
+            Log.d(TAG, "onCreateView: restoring");
+            return mContainer;
+        } else {
+            mContainer = inflater.inflate(R.layout.fragment_main, container, false);
+            recyclerView = mContainer.findViewById(R.id.recycler_view_main_fragment);
+            progressBar = mContainer.findViewById(R.id.progress_main_fragment);
+
+            Log.d(TAG, "onCreateView: else block");
+            createRecyclerView();
+        }
+        return mContainer;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLifecycle().addObserver(new MyLifeCycleObserver());
+        //getLifecycle().addObserver(new MyLifeCycleObserver());
     }
 
     private void createRecyclerView() {
         new MyAsyncTask(getActivity()).execute();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState: saving");
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        liveData = new Bundle();
     }
 
     private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -76,7 +104,6 @@ public class MainFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             DBHelper dbHelper = new DBHelper(context);
-
             Cursor cursor = dbHelper.SelectAll();
 
             dataList = new ArrayList<>();
@@ -87,7 +114,6 @@ public class MainFragment extends Fragment {
             }
 
 
-            recyclerView = ((Activity) context).findViewById(R.id.recycler_view_main_fragment);
             adapter = new RecyclerAdapterForMainFragment(MainFragment.this);
 
             layoutManager = new MyLinearLayoutManager(getActivity());
@@ -140,7 +166,7 @@ public class MainFragment extends Fragment {
                 ((Activity) context).runOnUiThread(new MyRunnable(i) {
                     @Override
                     public void run() {
-                        adapter.notifyItemInserted(this.updateIndex);
+                        adapter.insertItem(this.updateIndex);
                     }
                 });
 
@@ -150,14 +176,15 @@ public class MainFragment extends Fragment {
             cursor.close();
             return null;
         }
-
+        
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (getActivity() != null) {
+                Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
+                intent.setPackage(getActivity().getPackageName());
 
-            Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
-            intent.setPackage(getActivity().getPackageName());
-
-            getActivity().startService(intent);
+                getActivity().startService(intent);
+            }
         }
     }
 
@@ -191,8 +218,9 @@ public class MainFragment extends Fragment {
         public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
             Lifecycle.State currentState = source.getLifecycle().getCurrentState();
 
-            if (currentState == Lifecycle.State.STARTED && event != Lifecycle.Event.ON_PAUSE) {
-                dataList = new ArrayList<>();
+            Log.d(TAG, "onStateChanged: state " + currentState + " event " + event);
+
+            if (currentState == Lifecycle.State.STARTED && event == Lifecycle.Event.ON_CREATE) {
                 createRecyclerView();
             }
         }

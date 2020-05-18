@@ -21,6 +21,11 @@ import android.widget.TextView;
 
 import com.dnz.inc.bingwallpaper.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -74,8 +79,27 @@ public class ImageFragment extends Fragment {
             });
         }
 
+        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MMM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyymmdd", Locale.getDefault());
+
+        Date mDate = null;
+        try {
+            mDate = dateFormat1.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+
+            try {
+                mDate = dateFormat2.parse(date);
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+                throw  new IllegalArgumentException("invalid date supplied");
+            }
+        }
+
+        String str = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(mDate);
+
         ((TextView) getActivity().
-                findViewById(R.id.image_date_im_fragment)).setText(date);
+                findViewById(R.id.image_date_im_fragment)).setText(str);
         ((ImageView) getActivity().
                 findViewById(R.id.main_image_for_im_fragment)).setImageBitmap(bitmap);
 

@@ -44,7 +44,8 @@
             android:ellipsize="end"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintEnd_toStartOf="@+id/guideline_vertical_0.7"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            android:textColor="@android:color/white"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
