@@ -41,6 +41,12 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         holder.pictureDate.setText(dataStore.getDate());
         holder.copyright.setText(dataStore.getCopyright());
 
+        if (!dataStore.getBool()){
+            holder.favorites.setImageResource(R.drawable.ic_heart_paths);
+        }else{
+            holder.favorites.setImageResource(R.drawable.ic_heart_red);
+        }
+
     }
 
     @Override
@@ -48,7 +54,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         return mainFragment.dataList.size();
     }
 
-    public class CardVieHolder extends RecyclerView.ViewHolder {
+    public class CardVieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public CardView cardContainer;
         public ImageView bingImage, favorites;
@@ -63,25 +69,51 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
             pictureDate = itemView.findViewById(R.id.card_text_view_for_date);
             imageDescription = itemView.findViewById(R.id.card_text_view_for_image_desc);
             copyright = itemView.findViewById(R.id.copyright_for_image);
+            ImageView more = itemView.findViewById(R.id.card_more_vert);
 
-            cardContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            cardContainer.setOnClickListener(CardVieHolder.this);
+            favorites.setOnClickListener(CardVieHolder.this);
+            more.setOnClickListener(CardVieHolder.this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            DataStore data = mainFragment.dataList.get(position);
+
+            switch (view.getId()) {
+                case R.id.card_image_view_for_favorites:
+                    if (data.getBool()) {
+                        favorites.setImageResource(R.drawable.ic_heart_paths);
+                        MainActivity.db_conn.updateFavorites("0", data.get_id());
+                        data.updateBool(false);
+                    } else {
+                        favorites.setImageResource(R.drawable.ic_heart_red);
+                        MainActivity.db_conn.updateFavorites("1", data.get_id());
+                        data.updateBool(true);
+                    }
+                    break;
+                case R.id.card_more_vert:
+                    Log.d(TAG, "onClick: dots");
+                    break;
+                default:
                     String date = pictureDate.getText().toString();
                     String imageDesc = imageDescription.getText().toString();
                     String copyright_msg = copyright.getText().toString();
-                    Bitmap bitmap = ( (BitmapDrawable) bingImage.getDrawable()).getBitmap();
+                    Bitmap bitmap = ((BitmapDrawable) bingImage.getDrawable()).getBitmap();
 
-                    if (MainActivity.startFragment != null){
-                        MainActivity.startFragment.startImageFragment(bitmap,copyright_msg,imageDesc, date);
+                    if (MainActivity.startFragment != null) {
+                        MainActivity.startFragment.startImageFragment(bitmap, copyright_msg, imageDesc, date);
                     }
-                }
-            });
+                    break;
+            }
+
         }
     }
 
-    public  synchronized void insertItem(int position){
-        if (mainFragment.progressBar != null){
+
+    public synchronized void insertItem(int position) {
+        if (mainFragment.progressBar != null) {
             mainFragment.progressBar.setVisibility(View.INVISIBLE);
         }
         notifyItemInserted(position);

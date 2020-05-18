@@ -12,11 +12,14 @@ public class DataStore {
     private String fullCopyright;
     private String copyright;
 
-    public DataStore(Bitmap image, String date, String fullCopyright, boolean bool) {
+    private int _id;
+
+    public DataStore(Bitmap image, String date, String fullCopyright, boolean bool, int _id) {
         this.image = image;
         this.date = date;
         this.fullCopyright = fullCopyright;
         this.bool = bool;
+        this._id = _id;
 
         setTitle();
     }
@@ -50,5 +53,13 @@ public class DataStore {
 
     public boolean getBool() {
         return bool;
+    }
+
+    public int get_id(){
+        return _id;
+    }
+
+    public synchronized void updateBool(boolean bool){
+        this.bool = bool;
     }
 }

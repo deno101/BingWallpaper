@@ -1,5 +1,6 @@
 package com.dnz.inc.bingwallpaper;
 
+// TODO: MAKE ALL WRITE DB CONNECTIONS THREAD SAFE.... USING MAINACTIVITY.db_conn
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -14,6 +15,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.fragments.ImageFragment;
 import com.dnz.inc.bingwallpaper.fragments.MainFragment;
 import com.dnz.inc.bingwallpaper.net.CallBacks;
@@ -27,12 +29,15 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     public static CallBacks.StartFragment startFragment;
     public static FragmentTransaction ft;
 
+    public static DBHelper db_conn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         startFragment = this;
+        db_conn = new DBHelper(this);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);

@@ -45,4 +45,20 @@ public class DBHelper extends SQLiteOpenHelper {
     public Cursor SelectAll() {
         return getWritableDatabase().rawQuery(MyQueries.SELECT_ALL_QUERY, null);
     }
+
+    public boolean updateFavorites(String bool, int _id) {
+        ContentValues cv = new ContentValues();
+        if (!bool.matches("[0-1]")) {
+            throw new IllegalArgumentException("bool can only be '1' or '0'");
+        }
+        cv.put(ImageDataTable.COLUMN_IS_FAVORITE, bool);
+        String where = ImageDataTable._ID + " = " + _id;
+
+        int ret = getWritableDatabase().update(ImageDataTable.TABLE_NAME, cv, where, null);
+        if (ret == -1) {
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -134,6 +134,7 @@ public class MainFragment extends Fragment {
                 String date = cursor.getString(cursor.getColumnIndex(ContractSchema.ImageDataTable.COLUMN_D_C));
                 String isFavorite = cursor.getString(cursor.getColumnIndex(ContractSchema.ImageDataTable.COLUMN_IS_FAVORITE));
                 String title = cursor.getString(cursor.getColumnIndex(ContractSchema.ImageDataTable.COLUMN_TITLE));
+                int id = cursor.getInt(cursor.getColumnIndex(ContractSchema.ImageDataTable._ID));
 
                 Bitmap image = FileUtils.readImage(context.getFilesDir(), date);
 
@@ -151,7 +152,7 @@ public class MainFragment extends Fragment {
                     bool = true;
                 }
 
-                DataStore ds = new DataStore(image, dateInFormat, title, bool);
+                DataStore ds = new DataStore(image, dateInFormat, title, bool, id);
 
                 dataList.add(ds);
 
