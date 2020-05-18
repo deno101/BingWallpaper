@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.R;
 
 import java.text.ParseException;
@@ -34,7 +35,7 @@ import java.util.Locale;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ImageFragment extends Fragment {
+public class ImageFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ImageFragment";
     private GestureDetector mDetector;
 
@@ -71,14 +72,15 @@ public class ImageFragment extends Fragment {
     public void onStart() {
         super.onStart();
         initializeUI();
-        Log.d(TAG, "onStart: mcontainet." + mContainer.getId());
+
         l_one.clone(mContainer);
         l_two.clone(getContext(), R.layout.fragment_image_2);
+
+        ((ImageView) mContainer.findViewById(R.id.im_fragment_close)).setOnClickListener(this);
     }
 
     private void initializeUI() {
 
-        Log.d(TAG, "initializeUI: ");
 
         if (mDetector == null) {
             mDetector = new GestureDetector(getContext(), new MyGestureListener());
@@ -119,6 +121,15 @@ public class ImageFragment extends Fragment {
         ((TextView) getActivity().
                 findViewById(R.id.copyright_text_view)).setText(copyright);
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.im_fragment_close:
+                getFragmentManager().popBackStack();
+                break;
+        }
     }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {

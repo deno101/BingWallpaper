@@ -2,6 +2,7 @@ package com.dnz.inc.bingwallpaper;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     private Fragment mainFragment, displayImageFragment;
 
     public static CallBacks.StartFragment startFragment;
-
+    public static FragmentTransaction ft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +40,12 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
         int deviceWidthPixels = displayMetrics.widthPixels;
 
         Log.d(TAG, "onCreate: deviceWidthPixels" + deviceWidthPixels);
-
+        if (ft == null) {
+            initFT();
+        }
         mainFragment = new MainFragment();
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, mainFragment)
+            ft.add(R.id.fragment_container, mainFragment)
                     .commit();
         }
 
@@ -75,10 +77,25 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     @Override
     public void startImageFragment(Bitmap image, String copyright, String title, String date) {
         displayImageFragment = new ImageFragment(image, copyright, title, date);
+        try {
+            ft.replace(R.id.fragment_container, displayImageFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            initFT();
+            startImageFragment(image, copyright, title, date);
+        }
+    }
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, displayImageFragment)
-                .addToBackStack(null)
-                .commit();
+    private void initFT() {
+        ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.enter, R.anim.exit);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ft = null;
     }
 }
