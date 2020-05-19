@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -119,6 +120,14 @@ public class MainFragment extends Fragment {
                 public void run() {
                     recyclerView.setAdapter(adapter);
                     recyclerView.setLayoutManager(layoutManager);
+                    recyclerView.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View view, MotionEvent motionEvent) {
+                            // Todo: disable all clicked menus.
+
+                            return true;
+                        }
+                    });
                 }
             });
 

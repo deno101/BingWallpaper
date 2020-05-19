@@ -1,12 +1,15 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dnz.inc.bingwallpaper.MainActivity;
@@ -56,24 +59,30 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
     public class CardVieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public CardView cardContainer;
         public ImageView bingImage, favorites;
         public TextView pictureDate, imageDescription, copyright;
+        private LinearLayout menu;
+        private int mHeight;
+        private boolean isMenuUp;
+        private ValueAnimator anim;
 
         public CardVieHolder(@NonNull View itemView) {
             super(itemView);
 
-            cardContainer = itemView.findViewById(R.id.card_container);
-            bingImage = itemView.findViewById(R.id.image_view_for_main_image);
+            bingImage = itemView.findViewById(R.id.image_view_for_main_fragment);
             favorites = itemView.findViewById(R.id.card_image_view_for_favorites);
             pictureDate = itemView.findViewById(R.id.card_text_view_for_date);
             imageDescription = itemView.findViewById(R.id.card_text_view_for_image_desc);
             copyright = itemView.findViewById(R.id.copyright_for_image);
             ImageView more = itemView.findViewById(R.id.card_more_vert);
+            menu = itemView.findViewById(R.id.menu_for_card);
 
-            cardContainer.setOnClickListener(CardVieHolder.this);
+            bingImage.setOnClickListener(CardVieHolder.this);
             favorites.setOnClickListener(CardVieHolder.this);
             more.setOnClickListener(CardVieHolder.this);
+
+            itemView.findViewById(R.id.save_to_external).setOnClickListener(CardVieHolder.this);
+            itemView.findViewById(R.id.set_wallpaper).setOnClickListener(CardVieHolder.this);
         }
 
         @Override
@@ -94,9 +103,26 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     }
                     break;
                 case R.id.card_more_vert:
-                    Log.d(TAG, "onClick: dots");
+                    if (isMenuUp){
+                        shrinkMenu();
+                        isMenuUp = false;
+                    }else {
+                        expandMenu();
+                        isMenuUp = true;
+                    }
                     break;
-                default:
+
+                case R.id.save_to_external:
+                    Log.d(TAG, "onClick: save to external");
+                    // TODO: 5/19/20 save to external location
+                    break;
+
+                case R.id.set_wallpaper:
+                    Log.d(TAG, "onClick: set as wallpaper");
+                    // Todo: set wallpaer
+                    break;
+
+                case R.id.image_view_for_main_fragment:
                     String date = pictureDate.getText().toString();
                     String imageDesc = imageDescription.getText().toString();
                     String copyright_msg = copyright.getText().toString();
@@ -108,6 +134,37 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     break;
             }
 
+        }
+
+        private void expandMenu(){
+            if (anim == null){
+                initAnimation();
+            }
+            anim.start();
+        }
+
+        private void shrinkMenu(){
+            if (anim == null){
+                initAnimation();
+            }
+            anim.reverse();
+        }
+
+        private void initAnimation() {
+            menu.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            mHeight = menu.getMeasuredHeight();
+
+            anim = ValueAnimator.ofInt(0, mHeight);
+            anim.setDuration(300).setInterpolator(new AccelerateInterpolator());
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+
+                    ViewGroup.LayoutParams params = menu.getLayoutParams();
+                    params.height = (int) (mHeight * valueAnimator.getAnimatedFraction());
+                    menu.setLayoutParams(params);
+                }
+            });
         }
     }
 
