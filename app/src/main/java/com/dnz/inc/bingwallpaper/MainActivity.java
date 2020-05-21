@@ -1,6 +1,7 @@
 package com.dnz.inc.bingwallpaper;
 
 // TODO: MAKE ALL WRITE DB CONNECTIONS THREAD SAFE.... USING MAINACTIVITY.db_conn
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -9,6 +10,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -18,7 +20,9 @@ import android.widget.Toast;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.fragments.ImageFragment;
 import com.dnz.inc.bingwallpaper.fragments.MainFragment;
+import com.dnz.inc.bingwallpaper.fragments.RecyclerAdapterForMainFragment;
 import com.dnz.inc.bingwallpaper.net.CallBacks;
+import com.dnz.inc.bingwallpaper.utils.Permissions;
 
 import java.util.Calendar;
 
@@ -102,5 +106,14 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     protected void onPause() {
         super.onPause();
         ft = null;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+       if (requestCode == Permissions.WRITE_STORAGE_PERMISSION &&
+       grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+           RecyclerAdapterForMainFragment.saveCallBack.save();
+       }
     }
 }

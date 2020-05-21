@@ -1,12 +1,15 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.display.DisplayManager;
+import android.media.MediaScannerConnection;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -22,7 +25,12 @@ import android.widget.Toast;
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.R;
 import com.dnz.inc.bingwallpaper.utils.DataStore;
+import com.dnz.inc.bingwallpaper.utils.FileUtils;
+import com.dnz.inc.bingwallpaper.utils.Permissions;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
@@ -32,6 +40,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<RecyclerAdapterForMainFragment.CardVieHolder> {
     private static final String TAG = "RecyclerAdapterForMainF";
     private MainFragment mainFragment;
+
+    public static SaveCallBack saveCallBack;
 
     public RecyclerAdapterForMainFragment(MainFragment fragment) {
         this.mainFragment = fragment;
@@ -66,7 +76,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         return mainFragment.dataList.size();
     }
 
-    public class CardVieHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class CardVieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, SaveCallBack {
 
         public ImageView bingImage, favorites;
         public TextView pictureDate, imageDescription, copyright;
@@ -74,6 +84,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         private int mHeight;
         private boolean isMenuUp;
         private ValueAnimator anim;
+
 
         public CardVieHolder(@NonNull View itemView) {
             super(itemView);
@@ -120,8 +131,12 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     break;
 
                 case R.id.save_to_external:
-                    Log.d(TAG, "onClick: save to external");
-                    // TODO: 5/19/20 save to external location
+                    if (Permissions.checkStoragePermission(mainFragment.getActivity())) {
+                        saveFile();
+                    }else {
+                        Permissions.getStoragePermissions(mainFragment.getActivity());
+                        saveCallBack = CardVieHolder.this;
+                    }
                     break;
 
                 case R.id.set_wallpaper:
@@ -149,7 +164,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
             Display display = mainFragment.getActivity().getWindowManager().getDefaultDisplay();
 
-
+            shrinkMenu();
             int displayHeight = display.getHeight();
             int displayWidth = display.getWidth();
 
@@ -160,13 +175,13 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
             if (displayWidth <= imageWidth) {
                 xStart = ((imageWidth / 2) - (displayWidth / 2));
-            }else {
+            } else {
                 xWidth = imageWidth;
             }
 
             if (displayHeight <= imageHeight) {
                 yStart = ((imageHeight / 2) - (displayHeight / 2));
-            }else {
+            } else {
                 yHeight = imageHeight;
             }
 
@@ -176,15 +191,30 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                 manager.setBitmap(mBitmap);
                 Toast.makeText(mainFragment.getContext(),
                         "Wallpaper successfully changed", Toast.LENGTH_SHORT).show();
-                shrinkMenu();
 
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(mainFragment.getContext(),
                         "Unable to update wallpaper", Toast.LENGTH_SHORT).show();
-                shrinkMenu();
             }
 
+        }
+
+        public void saveFile() {
+            shrinkMenu();
+            File root = Environment.getExternalStoragePublicDirectory
+                    (Environment.DIRECTORY_PICTURES);
+            File file = new File(root, "Bing Wallpapers");
+            file.mkdir();
+
+            Bitmap bitmap = ((BitmapDrawable) bingImage.getDrawable()).getBitmap();
+            FileUtils.saveImageToFile(bitmap, file, imageDescription.getText().toString() + ".jpg");
+
+            MediaScannerConnection.scanFile(mainFragment.getActivity(), new String[]{file.toString()},
+                    null, null);
+
+            Toast.makeText(mainFragment.getContext(), "Image successfully changed",
+                    Toast.LENGTH_SHORT).show();
         }
 
         private void expandMenu() {
@@ -219,6 +249,11 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                 }
             });
         }
+
+        @Override
+        public void save() {
+            saveFile();
+        }
     }
 
 
@@ -228,4 +263,10 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         }
         notifyItemInserted(position);
     }
+
+    public interface SaveCallBack{
+        void save();
+    }
 }
+
+

@@ -2,6 +2,7 @@ package com.dnz.inc.bingwallpaper.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class FileUtils {
+    private static final String TAG = "FileUtils";
 
     public static void saveImageToFile(Bitmap image, File dir, String fileName){
         File file = new File(dir, fileName);
+
+        Log.d(TAG, "saveImageToFile: "+ file.toString());
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
 

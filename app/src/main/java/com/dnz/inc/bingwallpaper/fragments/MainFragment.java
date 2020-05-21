@@ -182,6 +182,7 @@ public class MainFragment extends Fragment {
                 Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
                 intent.setPackage(getActivity().getPackageName());
 
+                // TODO: 5/21/20  catch illegal state exception cannot start service while app is in backgroud 
                 getActivity().startService(intent);
             }
         }
