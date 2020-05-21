@@ -120,14 +120,6 @@ public class MainFragment extends Fragment {
                 public void run() {
                     recyclerView.setAdapter(adapter);
                     recyclerView.setLayoutManager(layoutManager);
-                    recyclerView.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View view, MotionEvent motionEvent) {
-                            // Todo: disable all clicked menus.
-
-                            return true;
-                        }
-                    });
                 }
             });
 

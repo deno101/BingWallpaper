@@ -1,20 +1,29 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
 import android.animation.ValueAnimator;
+import android.app.WallpaperManager;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.display.DisplayManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.R;
 import com.dnz.inc.bingwallpaper.utils.DataStore;
+
+import java.io.IOException;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -44,9 +53,9 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         holder.pictureDate.setText(dataStore.getDate());
         holder.copyright.setText(dataStore.getCopyright());
 
-        if (!dataStore.getBool()){
+        if (!dataStore.getBool()) {
             holder.favorites.setImageResource(R.drawable.ic_heart_paths);
-        }else{
+        } else {
             holder.favorites.setImageResource(R.drawable.ic_heart_red);
         }
 
@@ -103,12 +112,10 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     }
                     break;
                 case R.id.card_more_vert:
-                    if (isMenuUp){
+                    if (isMenuUp) {
                         shrinkMenu();
-                        isMenuUp = false;
-                    }else {
+                    } else {
                         expandMenu();
-                        isMenuUp = true;
                     }
                     break;
 
@@ -118,8 +125,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     break;
 
                 case R.id.set_wallpaper:
-                    Log.d(TAG, "onClick: set as wallpaper");
-                    // Todo: set wallpaer
+                    setWallpaper();
                     break;
 
                 case R.id.image_view_for_main_fragment:
@@ -136,18 +142,65 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
         }
 
-        private void expandMenu(){
-            if (anim == null){
+        private void setWallpaper() {
+            WallpaperManager manager = WallpaperManager.getInstance(mainFragment.getContext());
+
+            Bitmap mBitmap = ((BitmapDrawable) bingImage.getDrawable()).getBitmap();
+
+            Display display = mainFragment.getActivity().getWindowManager().getDefaultDisplay();
+
+
+            int displayHeight = display.getHeight();
+            int displayWidth = display.getWidth();
+
+            int imageHeight = mBitmap.getHeight();
+            int imageWidth = mBitmap.getWidth();
+
+            int xStart = 0, yStart = 0, xWidth = displayWidth, yHeight = displayHeight;
+
+            if (displayWidth <= imageWidth) {
+                xStart = ((imageWidth / 2) - (displayWidth / 2));
+            }else {
+                xWidth = imageWidth;
+            }
+
+            if (displayHeight <= imageHeight) {
+                yStart = ((imageHeight / 2) - (displayHeight / 2));
+            }else {
+                yHeight = imageHeight;
+            }
+
+            mBitmap = Bitmap.createBitmap(mBitmap, xStart, yStart, xWidth, yHeight);
+
+            try {
+                manager.setBitmap(mBitmap);
+                Toast.makeText(mainFragment.getContext(),
+                        "Wallpaper successfully changed", Toast.LENGTH_SHORT).show();
+                shrinkMenu();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(mainFragment.getContext(),
+                        "Unable to update wallpaper", Toast.LENGTH_SHORT).show();
+                shrinkMenu();
+            }
+
+        }
+
+        private void expandMenu() {
+            if (anim == null) {
                 initAnimation();
             }
             anim.start();
+            isMenuUp = true;
         }
 
-        private void shrinkMenu(){
-            if (anim == null){
+        private void shrinkMenu() {
+            if (anim == null) {
                 initAnimation();
             }
             anim.reverse();
+            isMenuUp = false;
         }
 
         private void initAnimation() {
