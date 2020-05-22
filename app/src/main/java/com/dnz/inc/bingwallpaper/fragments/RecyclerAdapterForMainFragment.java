@@ -224,12 +224,10 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                 int displayHeight = display.getHeight();
                 int displayWidth = display.getWidth();
 
-                Log.d(TAG, "doInBackground: display H x W: " + displayHeight + " x " + displayWidth);
 
                 int imageHeight = mBitmap.getHeight();
                 int imageWidth = mBitmap.getWidth();
 
-                Log.d(TAG, "doInBackground: image H x W: " + imageHeight + " x " + imageWidth);
 
                 int xStart = 0, yStart = 0, xWidth = displayWidth, yHeight = displayHeight;
 
@@ -238,22 +236,18 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     xStart = ((imageWidth / 2) - (displayWidth / 2));
                     yStart = ((imageHeight / 2) - (displayHeight / 2));
 
-                    Log.d(TAG, "doInBackground: one");
                 } else if (displayWidth <= imageWidth && displayHeight >= imageHeight) {
                     int scaledWidth = (int)(imageHeight * (displayWidth / (float) displayHeight));
                     xStart = ((imageWidth / 2) - (scaledWidth / 2));
 
                     xWidth = scaledWidth;
                     yHeight = imageHeight;
-                    Log.d(TAG, "doInBackground: two");
-                    Log.d(TAG, "doInBackground: " + xStart + " "+ yStart + " "+ xWidth + " "+ yHeight);
                 } else if (displayWidth >= imageWidth && displayHeight <= imageHeight) {
                     int scaledHeight = (int) (imageWidth * (displayHeight / (float)displayWidth));
                     xStart = ((imageWidth / 2) - (scaledHeight / 2));
 
                     yHeight = scaledHeight;
                     xWidth = imageWidth;
-                    Log.d(TAG, "doInBackground: three");
                 } else if (displayWidth >= imageWidth && displayHeight >= imageHeight) {
                     if (displayWidth >= displayHeight) {
                         int scaledHeight = (int) (imageWidth * (displayHeight / (float)displayWidth));
@@ -269,7 +263,6 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                         yHeight = imageHeight;
                     }
 
-                    Log.d(TAG, "doInBackground: four");
                 }
 
                 mBitmap = Bitmap.createBitmap(mBitmap, xStart, yStart, xWidth, yHeight);

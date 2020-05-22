@@ -4,10 +4,21 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 
+import com.dnz.inc.bingwallpaper.R;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class Permissions {
 
@@ -36,7 +47,7 @@ public class Permissions {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    public static boolean checkStoragePermission(Activity context){
+    public static boolean checkStoragePermission(Activity context) {
         return checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, context);
     }
 }
