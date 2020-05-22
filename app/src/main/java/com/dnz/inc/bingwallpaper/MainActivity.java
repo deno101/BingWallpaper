@@ -1,6 +1,7 @@
 package com.dnz.inc.bingwallpaper;
 
 // TODO: MAKE ALL WRITE DB CONNECTIONS THREAD SAFE.... USING MAINACTIVITY.db_conn
+// TODO: make desc text alighn to left in image fragment
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -87,10 +88,12 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     public void startImageFragment(Bitmap image, String copyright, String title, String date) {
         displayImageFragment = new ImageFragment(image, copyright, title, date);
         try {
+            // TODO: 5/21/20 catch null pointer exception ft (is null)
+
             ft.replace(R.id.fragment_container, displayImageFragment)
                     .addToBackStack(null)
                     .commit();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | NullPointerException e) {
             e.printStackTrace();
             initFT();
             startImageFragment(image, copyright, title, date);

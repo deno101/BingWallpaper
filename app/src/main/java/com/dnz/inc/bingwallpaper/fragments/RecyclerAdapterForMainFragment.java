@@ -1,21 +1,17 @@
 package com.dnz.inc.bingwallpaper.fragments;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.app.WallpaperManager;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.hardware.display.DisplayManager;
 import android.media.MediaScannerConnection;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,12 +25,9 @@ import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.Permissions;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<RecyclerAdapterForMainFragment.CardVieHolder> {
@@ -133,7 +126,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                 case R.id.save_to_external:
                     if (Permissions.checkStoragePermission(mainFragment.getActivity())) {
                         saveFile();
-                    }else {
+                    } else {
                         Permissions.getStoragePermissions(mainFragment.getActivity());
                         saveCallBack = CardVieHolder.this;
                     }
@@ -158,45 +151,8 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         }
 
         private void setWallpaper() {
-            WallpaperManager manager = WallpaperManager.getInstance(mainFragment.getContext());
-
-            Bitmap mBitmap = ((BitmapDrawable) bingImage.getDrawable()).getBitmap();
-
-            Display display = mainFragment.getActivity().getWindowManager().getDefaultDisplay();
-
             shrinkMenu();
-            int displayHeight = display.getHeight();
-            int displayWidth = display.getWidth();
-
-            int imageHeight = mBitmap.getHeight();
-            int imageWidth = mBitmap.getWidth();
-
-            int xStart = 0, yStart = 0, xWidth = displayWidth, yHeight = displayHeight;
-
-            if (displayWidth <= imageWidth) {
-                xStart = ((imageWidth / 2) - (displayWidth / 2));
-            } else {
-                xWidth = imageWidth;
-            }
-
-            if (displayHeight <= imageHeight) {
-                yStart = ((imageHeight / 2) - (displayHeight / 2));
-            } else {
-                yHeight = imageHeight;
-            }
-
-            mBitmap = Bitmap.createBitmap(mBitmap, xStart, yStart, xWidth, yHeight);
-
-            try {
-                manager.setBitmap(mBitmap);
-                Toast.makeText(mainFragment.getContext(),
-                        "Wallpaper successfully changed", Toast.LENGTH_SHORT).show();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(mainFragment.getContext(),
-                        "Unable to update wallpaper", Toast.LENGTH_SHORT).show();
-            }
+            new ChangeWallPaper().execute(((BitmapDrawable) bingImage.getDrawable()).getBitmap());
 
         }
 
@@ -254,6 +210,90 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         public void save() {
             saveFile();
         }
+
+        private class ChangeWallPaper extends AsyncTask<Bitmap, Void, Boolean> {
+
+            @Override
+            protected Boolean doInBackground(Bitmap... voids) {
+                WallpaperManager manager = WallpaperManager.getInstance(mainFragment.getContext());
+
+                Bitmap mBitmap = voids[0];
+
+                Display display = mainFragment.getActivity().getWindowManager().getDefaultDisplay();
+
+                int displayHeight = display.getHeight();
+                int displayWidth = display.getWidth();
+
+                Log.d(TAG, "doInBackground: display H x W: " + displayHeight + " x " + displayWidth);
+
+                int imageHeight = mBitmap.getHeight();
+                int imageWidth = mBitmap.getWidth();
+
+                Log.d(TAG, "doInBackground: image H x W: " + imageHeight + " x " + imageWidth);
+
+                int xStart = 0, yStart = 0, xWidth = displayWidth, yHeight = displayHeight;
+
+                if (displayWidth <= imageWidth && displayHeight <= imageHeight) {
+
+                    xStart = ((imageWidth / 2) - (displayWidth / 2));
+                    yStart = ((imageHeight / 2) - (displayHeight / 2));
+
+                    Log.d(TAG, "doInBackground: one");
+                } else if (displayWidth <= imageWidth && displayHeight >= imageHeight) {
+                    int scaledWidth = (int)(imageHeight * (displayWidth / (float) displayHeight));
+                    xStart = ((imageWidth / 2) - (scaledWidth / 2));
+
+                    xWidth = scaledWidth;
+                    yHeight = imageHeight;
+                    Log.d(TAG, "doInBackground: two");
+                    Log.d(TAG, "doInBackground: " + xStart + " "+ yStart + " "+ xWidth + " "+ yHeight);
+                } else if (displayWidth >= imageWidth && displayHeight <= imageHeight) {
+                    int scaledHeight = (int) (imageWidth * (displayHeight / (float)displayWidth));
+                    xStart = ((imageWidth / 2) - (scaledHeight / 2));
+
+                    yHeight = scaledHeight;
+                    xWidth = imageWidth;
+                    Log.d(TAG, "doInBackground: three");
+                } else if (displayWidth >= imageWidth && displayHeight >= imageHeight) {
+                    if (displayWidth >= displayHeight) {
+                        int scaledHeight = (int) (imageWidth * (displayHeight / (float)displayWidth));
+                        xStart = ((imageWidth / 2) - (scaledHeight / 2));
+
+                        yHeight = scaledHeight;
+                        xWidth = imageWidth;
+                    } else {
+                        int scaledWidth = (int) (imageHeight * (displayWidth / (float) displayHeight));
+                        xStart = ((imageWidth / 2) - (scaledWidth / 2));
+
+                        xWidth = scaledWidth;
+                        yHeight = imageHeight;
+                    }
+
+                    Log.d(TAG, "doInBackground: four");
+                }
+
+                mBitmap = Bitmap.createBitmap(mBitmap, xStart, yStart, xWidth, yHeight);
+
+                try {
+                    manager.setBitmap(mBitmap);
+                    return true;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (aBoolean) {
+                    Toast.makeText(mainFragment.getContext(),
+                            "Wallpaper successfully changed", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mainFragment.getContext(),
+                            "Unable to update wallpaper", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
 
@@ -264,9 +304,10 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
         notifyItemInserted(position);
     }
 
-    public interface SaveCallBack{
+    public interface SaveCallBack {
         void save();
     }
+
 }
 
 
