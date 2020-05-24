@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
@@ -47,7 +48,9 @@ public class MainFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private View mContainer;
 
-    private Bundle liveData;
+    public static ConstraintLayout notificationBar;
+
+    public static Bundle liveData;
 
     public ProgressBar progressBar;
 
@@ -64,6 +67,7 @@ public class MainFragment extends Fragment {
             mContainer = inflater.inflate(R.layout.fragment_main, container, false);
             recyclerView = mContainer.findViewById(R.id.recycler_view_main_fragment);
             progressBar = mContainer.findViewById(R.id.progress_main_fragment);
+            notificationBar = mContainer.findViewById(R.id.floating_notification);
 
             createRecyclerView();
         }
@@ -88,7 +92,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
         liveData = new Bundle();
     }
 
@@ -175,15 +178,18 @@ public class MainFragment extends Fragment {
             cursor.close();
             return null;
         }
-        
+
         @Override
         protected void onPostExecute(Void aVoid) {
             if (getActivity() != null) {
                 Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
                 intent.setPackage(getActivity().getPackageName());
+                try {
+                    getActivity().startService(intent);
 
-                // TODO: 5/21/20  catch illegal state exception cannot start service while app is in backgroud 
-                getActivity().startService(intent);
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -29,8 +29,6 @@
             android:gravity="start"
             android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/copyright_text_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

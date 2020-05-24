@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.dnz.inc.bingwallpaper.db.ContractSchema;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.net.MyRequest;
+import com.dnz.inc.bingwallpaper.utils.Notification;
 
 import java.util.ArrayList;
 
@@ -45,8 +46,10 @@ public class UpdateService extends Service {
 
         if (internetCheck()) {
             new MyRequest().makeAPICall(1, this);
+            Notification.showNotification(Notification.LOADING, "Checking for new wallpapers");
         }else {
-            Toast.makeText(this, "Check your internet Connection", Toast.LENGTH_LONG).show();
+            Notification.showNotification(Notification.ERROR, "Error: Check internet Connection");
+
         }
         return returnCode;
     }

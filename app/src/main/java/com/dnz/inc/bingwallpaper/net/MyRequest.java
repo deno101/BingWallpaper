@@ -10,7 +10,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.UpdateService;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
+import com.dnz.inc.bingwallpaper.fragments.MainFragment;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
+import com.dnz.inc.bingwallpaper.utils.Notification;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +40,10 @@ public class MyRequest {
                             }
 
                             if (hasMatch) {
+                                Notification.showNotification(Notification.SUCCESS, "Wallpapers upto-date.");
                                 return;
+                            } else {
+                                Notification.showNotification(Notification.SUCCESS, "Updating wallpapers.");
                             }
                             String title = jsonObject.getString("copyright").trim();
                             String fullImgURL = NetUtils.getCoreUrl(jsonObject.getString("url"));
@@ -56,7 +61,7 @@ public class MyRequest {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Notification.showNotification(Notification.ERROR, error.getMessage());
                     }
                 });
 
@@ -76,10 +81,11 @@ public class MyRequest {
                         String title = splited[0];
                         String copright = splited[1];
 
-                        if (MainActivity.startFragment != null){
+                        if (MainActivity.startFragment != null) {
                             try {
-                                MainActivity.startFragment.startImageFragment(response, copright, title, imageDate);
-                            }catch (IllegalStateException e){
+                                MainActivity.startFragment.startImageFragment(response, copright, title, this.imageDate);
+                                MainFragment.liveData = null;
+                            } catch (IllegalStateException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -88,7 +94,7 @@ public class MyRequest {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Notification.showNotification(Notification.ERROR, error.getMessage());
                     }
                 });
 
