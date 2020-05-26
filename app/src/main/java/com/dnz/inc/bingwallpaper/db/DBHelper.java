@@ -58,7 +58,13 @@ public class DBHelper extends SQLiteOpenHelper {
         if (ret == -1) {
             return false;
         }
-
         return true;
+    }
+
+    public boolean deleteEntry(int _id){
+        int ret = getWritableDatabase().delete(ImageDataTable.TABLE_NAME, ImageDataTable._ID + "=?",
+                new String[]{String.valueOf(_id)});
+
+        return ret != -1;
     }
 }

@@ -69,6 +69,7 @@ public class MainFragment extends Fragment {
             progressBar = mContainer.findViewById(R.id.progress_main_fragment);
             notificationBar = mContainer.findViewById(R.id.floating_notification);
 
+            liveData = new Bundle();
             createRecyclerView();
         }
         return mContainer;
@@ -77,11 +78,22 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getLifecycle().addObserver(new MyLifeCycleObserver());
+        getLifecycle().addObserver(new MyLifeCycleObserver());
+        Log.d(TAG, "onCreate: ");
     }
 
     private void createRecyclerView() {
         new MyAsyncTask(getActivity()).execute();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: called");
+        if (liveData == null){
+            Log.d(TAG, "onStart: in if");
+            createRecyclerView();
+        }
     }
 
     @Override
@@ -223,11 +235,8 @@ public class MainFragment extends Fragment {
         @Override
         public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
             Lifecycle.State currentState = source.getLifecycle().getCurrentState();
-
-
-            if (currentState == Lifecycle.State.STARTED && event == Lifecycle.Event.ON_CREATE) {
-                createRecyclerView();
-            }
+            Log.d(TAG, "onStateChanged: state: " + currentState + " event: " + event);
         }
+
     }
 }

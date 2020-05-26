@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     protected void onPause() {
         super.onPause();
         ft = null;
+        MainFragment.liveData = null;
     }
 
     @Override
@@ -120,4 +121,6 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
            RecyclerAdapterForMainFragment.saveCallBack.save();
        }
     }
+
+
 }

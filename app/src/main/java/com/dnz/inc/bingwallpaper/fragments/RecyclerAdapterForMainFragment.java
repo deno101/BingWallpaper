@@ -96,6 +96,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
             itemView.findViewById(R.id.save_to_external).setOnClickListener(CardVieHolder.this);
             itemView.findViewById(R.id.set_wallpaper).setOnClickListener(CardVieHolder.this);
+            itemView.findViewById(R.id.delete_card).setOnClickListener(CardVieHolder.this);
         }
 
         @Override
@@ -134,6 +135,13 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
                 case R.id.set_wallpaper:
                     setWallpaper();
+                    break;
+                case R.id.delete_card:
+                    shrinkMenu();
+                    MainActivity.db_conn.deleteEntry(data.get_id());
+                    mainFragment.dataList.remove(position);
+
+                    notifyItemRemoved(position);
                     break;
 
                 case R.id.image_view_for_main_fragment:
@@ -237,20 +245,20 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     yStart = ((imageHeight / 2) - (displayHeight / 2));
 
                 } else if (displayWidth <= imageWidth && displayHeight >= imageHeight) {
-                    int scaledWidth = (int)(imageHeight * (displayWidth / (float) displayHeight));
+                    int scaledWidth = (int) (imageHeight * (displayWidth / (float) displayHeight));
                     xStart = ((imageWidth / 2) - (scaledWidth / 2));
 
                     xWidth = scaledWidth;
                     yHeight = imageHeight;
                 } else if (displayWidth >= imageWidth && displayHeight <= imageHeight) {
-                    int scaledHeight = (int) (imageWidth * (displayHeight / (float)displayWidth));
+                    int scaledHeight = (int) (imageWidth * (displayHeight / (float) displayWidth));
                     xStart = ((imageWidth / 2) - (scaledHeight / 2));
 
                     yHeight = scaledHeight;
                     xWidth = imageWidth;
                 } else if (displayWidth >= imageWidth && displayHeight >= imageHeight) {
                     if (displayWidth >= displayHeight) {
-                        int scaledHeight = (int) (imageWidth * (displayHeight / (float)displayWidth));
+                        int scaledHeight = (int) (imageWidth * (displayHeight / (float) displayWidth));
                         xStart = ((imageWidth / 2) - (scaledHeight / 2));
 
                         yHeight = scaledHeight;

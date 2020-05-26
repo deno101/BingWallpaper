@@ -45,6 +45,7 @@ public class ImageFragment extends Fragment implements View.OnClickListener {
     private ConstraintSet l_two = new ConstraintSet();
 
     private ConstraintLayout mContainer;
+    public static boolean refreshMain;
 
 
     public ImageFragment(Bitmap bitmap, String copyright, String title, String date) {
@@ -57,6 +58,7 @@ public class ImageFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: state created");
         return mContainer =
                 (ConstraintLayout) inflater.inflate(R.layout.fragment_image, container, false);
     }
@@ -71,6 +73,11 @@ public class ImageFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+
+        if (refreshMain){
+            MainFragment.liveData = null;
+            refreshMain = false;
+        }
         initializeUI();
 
         l_one.clone(mContainer);

@@ -2,6 +2,7 @@ package com.dnz.inc.bingwallpaper.net;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -10,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.UpdateService;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
+import com.dnz.inc.bingwallpaper.fragments.ImageFragment;
 import com.dnz.inc.bingwallpaper.fragments.MainFragment;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.Notification;
@@ -19,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MyRequest {
+    private static final String TAG = "MyRequest";
 
     public void makeAPICall(int n, final Context appContext) {
         final DBHelper dbHelper = new DBHelper(appContext);
@@ -84,7 +87,7 @@ public class MyRequest {
                         if (MainActivity.startFragment != null) {
                             try {
                                 MainActivity.startFragment.startImageFragment(response, copright, title, this.imageDate);
-                                MainFragment.liveData = null;
+                                ImageFragment.refreshMain = true;
                             } catch (IllegalStateException e) {
                                 e.printStackTrace();
                             }
