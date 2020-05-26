@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     public static FragmentTransaction ft;
 
     public static DBHelper db_conn;
+    public static RecyclerAdapterForMainFragment.SaveCallBack saveCallBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +118,7 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
        if (requestCode == Permissions.WRITE_STORAGE_PERMISSION &&
        grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-           RecyclerAdapterForMainFragment.saveCallBack.save();
+           saveCallBack.save();
        }
     }
 

@@ -7,7 +7,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +33,6 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
     private static final String TAG = "RecyclerAdapterForMainF";
     private MainFragment mainFragment;
 
-    public static SaveCallBack saveCallBack;
 
     public RecyclerAdapterForMainFragment(MainFragment fragment) {
         this.mainFragment = fragment;
@@ -129,7 +127,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                         saveFile();
                     } else {
                         Permissions.getStoragePermissions(mainFragment.getActivity());
-                        saveCallBack = CardVieHolder.this;
+                        MainActivity.saveCallBack = CardVieHolder.this;
                     }
                     break;
 
@@ -138,7 +136,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     break;
                 case R.id.delete_card:
                     shrinkMenu();
-                    MainActivity.db_conn.deleteEntry(data.get_id());
+                    MainActivity.db_conn.deleteEntry_byID(data.get_id());
                     mainFragment.dataList.remove(position);
 
                     notifyItemRemoved(position);
