@@ -2,11 +2,13 @@ package com.dnz.inc.bingwallpaper.utils;
 
 import android.graphics.Bitmap;
 
+import java.util.Date;
+
 
 public class DataStore {
 
     private Bitmap image;
-    private String date;
+    private Date date;
     private String title;
     private boolean bool;
     private String fullCopyright;
@@ -14,7 +16,7 @@ public class DataStore {
 
     private int _id;
 
-    public DataStore(Bitmap image, String date, String fullCopyright, boolean bool, int _id) {
+    public DataStore(Bitmap image, Date date, String fullCopyright, boolean bool, int _id) {
         this.image = image;
         this.date = date;
         this.fullCopyright = fullCopyright;
@@ -39,7 +41,7 @@ public class DataStore {
         return image;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 

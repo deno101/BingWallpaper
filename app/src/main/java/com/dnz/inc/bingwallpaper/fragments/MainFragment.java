@@ -30,10 +30,12 @@ import com.dnz.inc.bingwallpaper.db.ContractSchema;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.utils.DataStore;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
+import com.dnz.inc.bingwallpaper.utils.TimeUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 
@@ -153,22 +155,13 @@ public class MainFragment extends Fragment {
                 int id = cursor.getInt(cursor.getColumnIndex(ContractSchema.ImageDataTable._ID));
 
                 Bitmap image = FileUtils.readImage(context.getFilesDir(), date);
-
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd", Locale.getDefault());
-                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-                String dateInFormat = null;
-
-                try {
-                    dateInFormat = sdf.format(sdf2.parse(date));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                Date mdate = TimeUtils.getDate(TimeUtils.PATTERN_JSON_DB, date);
 
                 if (isFavorite.equals("1")) {
                     bool = true;
                 }
 
-                DataStore ds = new DataStore(image, dateInFormat, title, bool, id);
+                DataStore ds = new DataStore(image, mdate, title, bool, id);
 
                 dataList.add(ds);
 

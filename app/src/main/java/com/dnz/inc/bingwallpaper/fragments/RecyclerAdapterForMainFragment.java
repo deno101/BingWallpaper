@@ -22,6 +22,7 @@ import com.dnz.inc.bingwallpaper.R;
 import com.dnz.inc.bingwallpaper.utils.DataStore;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.Permissions;
+import com.dnz.inc.bingwallpaper.utils.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
         holder.bingImage.setImageBitmap(dataStore.getBitmap());
         holder.imageDescription.setText(dataStore.getTitle());
-        holder.pictureDate.setText(dataStore.getDate());
+        holder.pictureDate.setText(TimeUtils.forDisplay(dataStore.getDate()));
         holder.copyright.setText(dataStore.getCopyright());
 
         if (!dataStore.getBool()) {
