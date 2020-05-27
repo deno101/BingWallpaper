@@ -144,14 +144,15 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                     break;
 
                 case R.id.image_view_for_main_fragment:
-                    String date = pictureDate.getText().toString();
-                    String imageDesc = imageDescription.getText().toString();
-                    String copyright_msg = copyright.getText().toString();
-                    Bitmap bitmap = ((BitmapDrawable) bingImage.getDrawable()).getBitmap();
 
-                    if (MainActivity.startFragment != null) {
-                        MainActivity.startFragment.startImageFragment(bitmap, copyright_msg, imageDesc, date);
-                    }
+                    ImageFragment imageFragment = new ImageFragment(mainFragment.dataList.get(position));
+                    mainFragment.getFragmentManager().
+                            beginTransaction().
+                            setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.enter, R.anim.exit).
+                            replace(R.id.fragment_container, imageFragment).
+                            addToBackStack(null).
+                            commit();
+
                     break;
             }
 

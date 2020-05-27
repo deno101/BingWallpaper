@@ -31,8 +31,10 @@ import android.widget.Toast;
 
 import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.R;
+import com.dnz.inc.bingwallpaper.utils.DataStore;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.Permissions;
+import com.dnz.inc.bingwallpaper.utils.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,13 +52,18 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
     private GestureDetector mDetector;
 
     private Bitmap bitmap;
-    private String copyright, title, date;
+    private String copyright, title, date = "Today";
     private ConstraintSet l_one = new ConstraintSet();
     private ConstraintSet l_two = new ConstraintSet();
+    private TextView textDescription, copyrightMsg, dateView;
+    private ImageView bingImage;
 
     private ConstraintLayout mContainer;
     public static boolean refreshMain;
-    private ImageView likeView;
+    private ImageView likeView, deleteView;
+    private boolean isFavorite;
+
+    private DataStore dataStore;
 
 
     public ImageFragment(Bitmap bitmap, String copyright, String title, String date) {
@@ -64,6 +71,10 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
         this.copyright = copyright;
         this.title = title;
         this.date = date;
+    }
+
+    public ImageFragment(DataStore dataStore) {
+        this.dataStore = dataStore;
     }
 
     @Override
@@ -88,23 +99,27 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
             MainFragment.liveData = null;
             refreshMain = false;
         }
-        initializeUI();
 
         l_one.clone(mContainer);
         l_two.clone(getContext(), R.layout.fragment_image_2);
 
         mContainer.findViewById(R.id.im_fragment_close).setOnClickListener(this);
-        mContainer.findViewById(R.id.image_view_delete).setOnClickListener(this);
         mContainer.findViewById(R.id.image_view_set_wallpaper).setOnClickListener(this);
         likeView = mContainer.findViewById(R.id.image_view_like);
+        deleteView = mContainer.findViewById(R.id.image_view_delete);
 
+        deleteView.setOnClickListener(this);
         likeView.setOnClickListener(this);
 
         mContainer.findViewById(R.id.image_view_save).setOnClickListener(this);
+        initializeUI();
     }
 
     private void initializeUI() {
-
+        bingImage = getActivity().findViewById(R.id.main_image_for_im_fragment);
+        copyrightMsg = getActivity().findViewById(R.id.copyright_text_view);
+        textDescription = getActivity().findViewById(R.id.description_text_view);
+        dateView = getActivity().findViewById(R.id.image_date_im_fragment);
 
         if (mDetector == null) {
             mDetector = new GestureDetector(getContext(), new MyGestureListener());
@@ -117,34 +132,25 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
             });
         }
 
-        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MMM-dd", Locale.getDefault());
-        SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyymmdd", Locale.getDefault());
 
-        Date mDate = null;
-        // TODO: 5/26/20 causes errors when loading from UpdateService
-        try {
-            mDate = dateFormat1.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if (dataStore != null) {
+            bitmap = dataStore.getBitmap();
+            date = TimeUtils.forDisplay(dataStore.getDate());
+            title = dataStore.getTitle();
+            copyright = dataStore.getCopyright();
 
-            try {
-                mDate = dateFormat2.parse(date);
-            } catch (ParseException ex) {
-                ex.printStackTrace();
-                throw new IllegalArgumentException("invalid date supplied");
+            if (dataStore.getBool()) {
+                isFavorite = true;
+                likeView.setImageResource(R.drawable.ic_heart_red);
             }
+        } else {
+            deleteView.setVisibility(View.GONE);
         }
 
-        String str = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(mDate);
-
-        ((TextView) getActivity().
-                findViewById(R.id.image_date_im_fragment)).setText(str);
-        ((ImageView) getActivity().
-                findViewById(R.id.main_image_for_im_fragment)).setImageBitmap(bitmap);
-        ((TextView) getActivity().
-                findViewById(R.id.description_text_view)).setText(title);
-        ((TextView) getActivity().
-                findViewById(R.id.copyright_text_view)).setText(copyright);
+        dateView.setText(date);
+        bingImage.setImageBitmap(bitmap);
+        textDescription.setText(title);
+        copyrightMsg.setText(copyright);
 
     }
 
@@ -156,8 +162,14 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
                 break;
 
             case R.id.image_view_like:
-                // TODO: 5/26/20 change constructor for imageFragment
-                likeView.setImageResource(R.drawable.ic_heart_red);
+                // TODO: 5/27/20 set amination drawable
+                if (isFavorite) {
+                    likeView.setImageResource(R.drawable.ic_heart_paths);
+                    isFavorite = false;
+                } else {
+                    likeView.setImageResource(R.drawable.ic_heart_red);
+                    isFavorite = true;
+                }
                 break;
             case R.id.image_view_delete:
                 MainActivity.db_conn.deleteEntry_byDate(date);
@@ -184,6 +196,7 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
         File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         root = new File(root, "Bing Wallpapers");
 
+        Toast.makeText(getContext(), "Image Saved", Toast.LENGTH_SHORT).show();
         FileUtils.saveImageToFile(bitmap, root, title + ".jpg");
         MediaScannerConnection.scanFile(getContext(), new String[]{root.toString()},
                 null, null);

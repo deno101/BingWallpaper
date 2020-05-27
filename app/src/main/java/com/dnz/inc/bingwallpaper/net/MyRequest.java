@@ -51,8 +51,7 @@ public class MyRequest {
                             String title = jsonObject.getString("copyright").trim();
                             String fullImgURL = NetUtils.getCoreUrl(jsonObject.getString("url"));
 
-                            dbHelper.insertData(title, imageDate, "0");
-                            getImage(fullImgURL, appContext, imageDate, title);
+                            getImage(dbHelper, fullImgURL, appContext, imageDate, title);
 
                             UpdateService.dataInDB.add(imageDate);
 
@@ -64,19 +63,21 @@ public class MyRequest {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Notification.showNotification(Notification.ERROR, error.getMessage());
+                        Notification.showNotification(Notification.ERROR, "Error: Check your internet Connection");
                     }
                 });
 
         NetUtils.getRequestQueue(appContext).add(apiRequest);
     }
 
-    private void getImage(final String fullImgURL, final Context context, String imageDate
+    private void getImage(final DBHelper dbHelper, final String fullImgURL, final Context context, String imageDate
             , final String fullTitle) {
         ImageRequest imageRequest = new ImageRequest(fullImgURL,
                 new MyImageResponseListener(imageDate) {
                     @Override
                     public void onResponse(Bitmap response) {
+                        dbHelper.insertData(fullTitle, imageDate, "0");
+
                         FileUtils.saveImageToFile(response, context.getFilesDir(), imageDate + ".jpg");
 
                         String[] splited = fullTitle.split("\\(|\\)");
@@ -97,7 +98,7 @@ public class MyRequest {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Notification.showNotification(Notification.ERROR, error.getMessage());
+                        Notification.showNotification(Notification.ERROR, "Error: Check your internet Connection");
                     }
                 });
 
