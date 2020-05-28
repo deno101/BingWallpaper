@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
-import android.view.ViewGroup;
 
 import com.dnz.inc.bingwallpaper.db.ContractSchema;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
@@ -24,6 +23,7 @@ import java.util.Date;
 import androidx.annotation.Nullable;
 
 public class UpdateService extends Service {
+    private static final String TAG = "UpdateService";
 
     public static ArrayList<String> dataInDB;
     private static final String CONFIG_FILE = "update_service.conf";
@@ -60,7 +60,7 @@ public class UpdateService extends Service {
                 Date now = new Date();
                 String lastsave = TimeUtils.forDB_JSON_FS(now);
                 FileUtils.writeToSharedPreferences(UpdateService.this,
-                        CONFIG_FILE, LAST_UPDATE_KEY, lastsave);
+                      CONFIG_FILE, LAST_UPDATE_KEY, lastsave);
             }
         };
 
@@ -89,6 +89,7 @@ public class UpdateService extends Service {
                     }
                 }
             }
+
         } else {
             downloadCount = 10;
         }

@@ -61,21 +61,21 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean deleteEntry_byID(int _id){
+    public boolean deleteEntry_byID(int _id) {
         int ret = getWritableDatabase().delete(ImageDataTable.TABLE_NAME, ImageDataTable._ID + "=?",
                 new String[]{String.valueOf(_id)});
 
         return ret != -1;
     }
 
-    public boolean deleteEntry_byDate(String date){
+    public boolean deleteEntry_byDate(String date) {
         int ret = getWritableDatabase().delete(ImageDataTable.TABLE_NAME,
-                ImageDataTable.COLUMN_D_C+"=?",new String[]{date});
+                ImageDataTable.COLUMN_D_C + "=?", new String[]{date});
 
         return ret != -1;
     }
 
-    public Cursor selectByDate(String date){
-        return getWritableDatabase().rawQuery(MyQueries.SELECT_BY_DATE+date, null);
+    public Cursor selectByDate(String date) {
+        return getWritableDatabase().rawQuery(MyQueries.SELECT_BY_DATE + "'" + date + "'", null);
     }
 }

@@ -15,7 +15,7 @@ public class MyQueries {
             String.format("DROP TABLE IF EXISTS %s", ImageDataTable.TABLE_NAME);
 
     public static final String SELECT_ALL_QUERY = String.format("SELECT * FROM %s ORDER BY %s DESC",
-            ImageDataTable.TABLE_NAME, ImageDataTable._ID);
+            ImageDataTable.TABLE_NAME, ImageDataTable.COLUMN_D_C);
 
     public static final String SELECT_BY_DATE = String.format("SELECT * FROM %s WHERE %s = ",
             ImageDataTable.TABLE_NAME, ImageDataTable.COLUMN_D_C);

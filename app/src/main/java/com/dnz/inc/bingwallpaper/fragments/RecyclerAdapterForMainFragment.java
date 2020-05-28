@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,6 +68,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
     public int getItemCount() {
         return mainFragment.dataList.size();
     }
+    
 
     public class CardVieHolder extends RecyclerView.ViewHolder implements View.OnClickListener, SaveCallBack {
 

@@ -3,12 +3,14 @@ package com.dnz.inc.bingwallpaper.net;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.dnz.inc.bingwallpaper.UpdateService;
+import com.dnz.inc.bingwallpaper.db.ContractSchema;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.fragments.MainFragment;
 import com.dnz.inc.bingwallpaper.utils.DataStore;
@@ -31,9 +33,11 @@ public class MyRequest {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+
                             Notification.showNotification(Notification.SUCCESS, "Loading Wallpapers");
                             JSONArray jsonArray = response.getJSONArray("images");
-                            for (int i = jsonArray.length() - 1; i > 0; i--) {
+
+                            for (int i = jsonArray.length() - 1; i >= 0; i--) {
                                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
                                 String imageDate = jsonObject.getString("startdate");
 
@@ -51,36 +55,17 @@ public class MyRequest {
                                 String title = jsonObject.getString("copyright").trim();
                                 String fullImgURL = NetUtils.getCoreUrl(jsonObject.getString("url"));
 
-                                getImage(dbHelper, fullImgURL, appContext, imageDate, title);
+                                getImage(appContext, dbHelper, fullImgURL, appContext, imageDate, title);
                                 UpdateService.dataInDB.add(imageDate);
 
-                                if (MainFragment.instance != null) {
 
-                                    Cursor cursor = dbHelper.selectByDate(imageDate);
-                                    while (cursor.moveToNext()) {
-                                        int _id = cursor.getInt(cursor.getColumnIndex(ImageDataTable._ID));
-
-                                        String imageDateCreated = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_D_C));
-                                        String fullTitle = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_TITLE));
-                                        String rawBool = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_IS_FAVORITE));
-
-                                        boolean bool = rawBool.equals("1");
-                                        Bitmap bitmap = FileUtils.readImage(appContext.getFilesDir(), imageDateCreated);
-                                        DataStore dataStore = new DataStore(bitmap, TimeUtils
-                                                .getDate(TimeUtils.PATTERN_JSON_DB, imageDateCreated),
-                                                fullTitle, bool, _id);
-
-
-                                        MainFragment.instance.dataList.add(0, dataStore);
-                                        MainFragment.instance.adapter.notifyItemInserted(0);
-                                    }
-                                }
                             }
 
                             futureTask.run();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -93,16 +78,45 @@ public class MyRequest {
         NetUtils.getRequestQueue(appContext).add(apiRequest);
     }
 
-    private void getImage(final DBHelper dbHelper, final String fullImgURL, final Context context, String imageDate
+    private void getImage(final Context appContext, final DBHelper dbHelper, final String fullImgURL, final Context context, String imageDate
             , final String fullTitle) {
 
         ImageRequest imageRequest = new ImageRequest(fullImgURL,
                 new MyImageResponseListener(imageDate) {
                     @Override
                     public void onResponse(Bitmap response) {
+                        FileUtils.saveImageToFile(response, context.getFilesDir(), imageDate + ".jpg");
                         dbHelper.insertData(fullTitle, imageDate, "0");
 
-                        FileUtils.saveImageToFile(response, context.getFilesDir(), imageDate + ".jpg");
+                        if (MainFragment.instance != null) {
+
+                            Cursor cursor = dbHelper.selectByDate(imageDate);
+
+                            while (cursor.moveToNext()) {
+
+                                int _id = cursor.getInt(cursor.getColumnIndex(ImageDataTable._ID));
+
+                                String imageDateCreated = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_D_C));
+                                String fullTitle = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_TITLE));
+                                String rawBool = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_IS_FAVORITE));
+
+                                boolean bool = rawBool.equals("1");
+                                Bitmap bitmap = FileUtils.readImage(appContext.getFilesDir(), imageDateCreated);
+                                DataStore dataStore = new DataStore(bitmap, TimeUtils
+                                        .getDate(TimeUtils.PATTERN_JSON_DB, imageDateCreated),
+                                        fullTitle, bool, _id);
+
+
+                                MainFragment.instance.dataList.add(0, dataStore);
+                                MainFragment.instance.getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        MainFragment.instance.adapter.insertItem(0);
+                                        MainFragment.instance.recyclerView.scrollToPosition(0);
+                                    }
+                                });
+                            }
+                        }
                     }
                 }, 1024, 1024, null,
                 new Response.ErrorListener() {

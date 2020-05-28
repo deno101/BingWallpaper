@@ -42,7 +42,7 @@ public class MainFragment extends Fragment {
     private static final String TAG = "MainFragment";
     public ArrayList<DataStore> dataList;
     public RecyclerAdapterForMainFragment adapter;
-    private RecyclerView recyclerView;
+    public RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private View mContainer;
 
@@ -77,8 +77,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        instance = this;
     }
 
     private void createRecyclerView() {
@@ -88,6 +86,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        instance = this;
 
         if (liveData == null){
             createRecyclerView();
