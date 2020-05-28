@@ -74,4 +74,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return ret != -1;
     }
+
+    public Cursor selectByDate(String date){
+        return getWritableDatabase().rawQuery(MyQueries.SELECT_BY_DATE+date, null);
+    }
 }

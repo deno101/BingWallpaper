@@ -1,20 +1,21 @@
 package com.dnz.inc.bingwallpaper.net;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.dnz.inc.bingwallpaper.MainActivity;
 import com.dnz.inc.bingwallpaper.UpdateService;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
-import com.dnz.inc.bingwallpaper.fragments.ImageFragment;
 import com.dnz.inc.bingwallpaper.fragments.MainFragment;
+import com.dnz.inc.bingwallpaper.utils.DataStore;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
+import com.dnz.inc.bingwallpaper.db.ContractSchema.ImageDataTable;
 import com.dnz.inc.bingwallpaper.utils.Notification;
+import com.dnz.inc.bingwallpaper.utils.TimeUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,38 +24,60 @@ import org.json.JSONObject;
 public class MyRequest {
     private static final String TAG = "MyRequest";
 
-    public void makeAPICall(int n, final Context appContext) {
+    public void makeAPICall(int n, final Context appContext, final CallBacks.FutureTask futureTask) {
         final DBHelper dbHelper = new DBHelper(appContext);
         JsonObjectRequest apiRequest = new JsonObjectRequest(NetUtils.getJsonUrl(n), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            Notification.showNotification(Notification.SUCCESS, "Loading Wallpapers");
                             JSONArray jsonArray = response.getJSONArray("images");
-                            JSONObject jsonObject = (JSONObject) jsonArray.get(0);
-                            String imageDate = jsonObject.getString("startdate");
+                            for (int i = jsonArray.length() - 1; i > 0; i--) {
+                                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                                String imageDate = jsonObject.getString("startdate");
 
-                            boolean hasMatch = false;
-                            for (String s : UpdateService.dataInDB) {
-                                if (s.equals(imageDate)) {
-                                    hasMatch = true;
-                                    break;
+                                boolean hasMatch = false;
+                                for (String s : UpdateService.dataInDB) {
+                                    if (s.equals(imageDate)) {
+                                        hasMatch = true;
+                                        break;
+                                    }
+                                }
+
+                                if (hasMatch) {
+                                    continue;
+                                }
+                                String title = jsonObject.getString("copyright").trim();
+                                String fullImgURL = NetUtils.getCoreUrl(jsonObject.getString("url"));
+
+                                getImage(dbHelper, fullImgURL, appContext, imageDate, title);
+                                UpdateService.dataInDB.add(imageDate);
+
+                                if (MainFragment.instance != null) {
+
+                                    Cursor cursor = dbHelper.selectByDate(imageDate);
+                                    while (cursor.moveToNext()) {
+                                        int _id = cursor.getInt(cursor.getColumnIndex(ImageDataTable._ID));
+
+                                        String imageDateCreated = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_D_C));
+                                        String fullTitle = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_TITLE));
+                                        String rawBool = cursor.getString(cursor.getColumnIndex(ImageDataTable.COLUMN_IS_FAVORITE));
+
+                                        boolean bool = rawBool.equals("1");
+                                        Bitmap bitmap = FileUtils.readImage(appContext.getFilesDir(), imageDateCreated);
+                                        DataStore dataStore = new DataStore(bitmap, TimeUtils
+                                                .getDate(TimeUtils.PATTERN_JSON_DB, imageDateCreated),
+                                                fullTitle, bool, _id);
+
+
+                                        MainFragment.instance.dataList.add(0, dataStore);
+                                        MainFragment.instance.adapter.notifyItemInserted(0);
+                                    }
                                 }
                             }
 
-                            if (hasMatch) {
-                                Notification.showNotification(Notification.SUCCESS, "Wallpapers upto-date.");
-                                return;
-                            } else {
-                                Notification.showNotification(Notification.SUCCESS, "Updating wallpapers.");
-                            }
-                            String title = jsonObject.getString("copyright").trim();
-                            String fullImgURL = NetUtils.getCoreUrl(jsonObject.getString("url"));
-
-                            getImage(dbHelper, fullImgURL, appContext, imageDate, title);
-
-                            UpdateService.dataInDB.add(imageDate);
-
+                            futureTask.run();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -72,6 +95,7 @@ public class MyRequest {
 
     private void getImage(final DBHelper dbHelper, final String fullImgURL, final Context context, String imageDate
             , final String fullTitle) {
+
         ImageRequest imageRequest = new ImageRequest(fullImgURL,
                 new MyImageResponseListener(imageDate) {
                     @Override
@@ -79,20 +103,6 @@ public class MyRequest {
                         dbHelper.insertData(fullTitle, imageDate, "0");
 
                         FileUtils.saveImageToFile(response, context.getFilesDir(), imageDate + ".jpg");
-
-                        String[] splited = fullTitle.split("\\(|\\)");
-
-                        String title = splited[0];
-                        String copright = splited[1];
-
-                        if (MainActivity.startFragment != null) {
-                            try {
-                                MainActivity.startFragment.startImageFragment(response, copright, title, this.imageDate);
-                                ImageFragment.refreshMain = true;
-                            } catch (IllegalStateException e) {
-                                e.printStackTrace();
-                            }
-                        }
                     }
                 }, 1024, 1024, null,
                 new Response.ErrorListener() {

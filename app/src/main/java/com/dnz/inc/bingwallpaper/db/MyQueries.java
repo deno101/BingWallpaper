@@ -16,4 +16,7 @@ public class MyQueries {
 
     public static final String SELECT_ALL_QUERY = String.format("SELECT * FROM %s ORDER BY %s DESC",
             ImageDataTable.TABLE_NAME, ImageDataTable._ID);
+
+    public static final String SELECT_BY_DATE = String.format("SELECT * FROM %s WHERE %s = ",
+            ImageDataTable.TABLE_NAME, ImageDataTable.COLUMN_D_C);
 }

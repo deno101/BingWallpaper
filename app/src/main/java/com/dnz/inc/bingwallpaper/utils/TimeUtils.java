@@ -1,7 +1,5 @@
 package com.dnz.inc.bingwallpaper.utils;
 
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,6 +11,8 @@ public class TimeUtils {
 
     public static String PATTERN_JSON_DB = "yyyyMMdd";
     public static String PATTERN_DISPLAY = "yyyy-MMM-dd";
+
+    public static double ONE_DAY = 24 * 60 * 60 * 1000;
 
 
     public static Date getDate(String pattern, String date) {
@@ -41,11 +41,30 @@ public class TimeUtils {
         return sDate;
     }
 
+    public static String forDB_JSON_FS(Date date) {
+        return new SimpleDateFormat(PATTERN_JSON_DB, Locale.getDefault()).format(date);
+    }
+
     private static boolean compareDates(Calendar calendar, Date date) {
         Calendar calenderDate = Calendar.getInstance();
         calenderDate.setTime(date);
 
         return calendar.get(Calendar.YEAR) == calenderDate.get(Calendar.YEAR) && calendar.get(Calendar.MONTH) == calenderDate.get(Calendar.MONTH)
                 && calendar.get(Calendar.DAY_OF_MONTH) == calenderDate.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public static Calendar getTimeAsOfMidnight(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH),
+                0,
+                0,
+                0
+        );
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar;
     }
 }

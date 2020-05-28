@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -32,11 +31,8 @@ import com.dnz.inc.bingwallpaper.utils.DataStore;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.TimeUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 
 /**
@@ -45,7 +41,7 @@ import java.util.Locale;
 public class MainFragment extends Fragment {
     private static final String TAG = "MainFragment";
     public ArrayList<DataStore> dataList;
-    private RecyclerAdapterForMainFragment adapter;
+    public RecyclerAdapterForMainFragment adapter;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private View mContainer;
@@ -53,9 +49,9 @@ public class MainFragment extends Fragment {
     public static ConstraintLayout notificationBar;
 
     public static Bundle liveData;
-
     public ProgressBar progressBar;
 
+    public static MainFragment instance;
     public MainFragment() {
 
     }
@@ -74,14 +70,15 @@ public class MainFragment extends Fragment {
             liveData = new Bundle();
             createRecyclerView();
         }
+
         return mContainer;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLifecycle().addObserver(new MyLifeCycleObserver());
-        Log.d(TAG, "onCreate: ");
+
+        instance = this;
     }
 
     private void createRecyclerView() {
@@ -91,9 +88,8 @@ public class MainFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart: called");
+
         if (liveData == null){
-            Log.d(TAG, "onStart: in if");
             createRecyclerView();
         }
     }
@@ -162,7 +158,6 @@ public class MainFragment extends Fragment {
                 }
 
                 DataStore ds = new DataStore(image, mdate, title, bool, id);
-
                 dataList.add(ds);
 
                 try {

@@ -1,5 +1,7 @@
 package com.dnz.inc.bingwallpaper.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -13,10 +15,17 @@ import java.io.IOException;
 public class FileUtils {
     private static final String TAG = "FileUtils";
 
-    public static void saveImageToFile(Bitmap image, File dir, String fileName){
+    /**
+     * Compresses an image then saves it a specified dir
+     * Note all files saved with ".jpg" extension
+     *
+     * @param image    image to dave.
+     * @param dir      root dir for file
+     * @param fileName filename string without an extension.
+     */
+    public static void saveImageToFile(Bitmap image, File dir, String fileName) {
         File file = new File(dir, fileName);
 
-        Log.d(TAG, "saveImageToFile: "+ file.toString());
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
 
@@ -30,24 +39,37 @@ public class FileUtils {
                 ex.printStackTrace();
             }
 
-            if (bool){
+            if (bool) {
                 saveImageToFile(image, dir, fileName);
-            }else {
+            } else {
                 throw new IllegalStateException("Failed to create image file");
             }
         }
     }
 
-    public static Bitmap readImage(File path, String filename){
-        path = new File(path, filename+".jpg");
+    public static Bitmap readImage(File path, String filename) {
+        path = new File(path, filename + ".jpg");
         Bitmap image = null;
         try {
-            FileInputStream fin  = new FileInputStream(path);
+            FileInputStream fin = new FileInputStream(path);
             image = BitmapFactory.decodeStream(fin);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         return image;
+    }
+
+    public static String getFromSharedPreferences(Context context, String filename, String key) {
+        String ret = null;
+        ret = context.getSharedPreferences(filename, Context.MODE_PRIVATE).getString(key, null);
+        return ret;
+    }
+
+    public static void writeToSharedPreferences(Context context, String filename, String key,
+                                                String value) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(filename, Context.MODE_PRIVATE).edit();
+        editor.putString(key, value);
+        editor.apply();
     }
 }
