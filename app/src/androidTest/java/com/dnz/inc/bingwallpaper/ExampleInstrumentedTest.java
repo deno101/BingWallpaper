@@ -1,5 +1,7 @@
 package com.dnz.inc.bingwallpaper;
 
+import android.app.job.JobInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.util.Log;
 
@@ -50,5 +52,15 @@ public class ExampleInstrumentedTest {
         long difference = calendar.getTimeInMillis() - date1.getTime();
         int days = (int) (difference / TimeUtils.ONE_DAY);
         assertEquals(days, 4);
+    }
+
+    @Test
+    public void jobInfoTest(){
+        JobInfo jobInfo = new JobInfo.Builder((int) (Math.random()*100), new ComponentName
+                ("com.dnz.inc.bingwallpaper", "com.dnz.inc.bingwallpaper.UPDATE_SERVICE"))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .build();
+
+        assertEquals( jobInfo.isPeriodic() , false);
     }
 }

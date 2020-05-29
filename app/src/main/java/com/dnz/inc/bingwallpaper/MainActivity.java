@@ -2,6 +2,7 @@ package com.dnz.inc.bingwallpaper;
 
 // TODO: MAKE ALL WRITE DB CONNECTIONS THREAD SAFE.... USING MAINACTIVITY.db_conn
 // TODO: make desc text alighn to left in image fragment
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -66,24 +67,19 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
 
     private void setAlarm() {
         Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
-        intent.putExtra("from", "alarmManger");
+        intent.putExtra("from", UpdateService.class.getName());
 
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0,
-                intent, PendingIntent.FLAG_NO_CREATE);
-
-        if (pendingIntent == null) {
-            return;
-        }
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Log.d(TAG, "setAlarm: pending intent" + pendingIntent.toString());
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        // TODO: 5/29/20 change back after test 
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, pendingIntent);
-
-        Toast.makeText(this, "Alarm_created", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -116,10 +112,10 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-       if (requestCode == Permissions.WRITE_STORAGE_PERMISSION &&
-       grantResults[0] == PackageManager.PERMISSION_GRANTED){
-           saveCallBack.save();
-       }
+        if (requestCode == Permissions.WRITE_STORAGE_PERMISSION &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            saveCallBack.save();
+        }
     }
 
 
