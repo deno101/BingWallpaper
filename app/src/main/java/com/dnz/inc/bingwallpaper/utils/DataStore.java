@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import java.util.Date;
 
 
-public class DataStore {
+public class DataStore implements Comparable<DataStore> {
 
     private Bitmap image;
     private Date date;
@@ -27,13 +27,12 @@ public class DataStore {
     }
 
 
-
-    private void setTitle(){
+    private void setTitle() {
         fullCopyright = fullCopyright.trim();
         String[] temp = fullCopyright.split("\\(|\\)");
 
         title = temp[0];
-        copyright = temp[temp.length -1];
+        copyright = temp[temp.length - 1];
 
     }
 
@@ -57,11 +56,17 @@ public class DataStore {
         return bool;
     }
 
-    public int get_id(){
+    public int get_id() {
         return _id;
     }
 
-    public synchronized void updateBool(boolean bool){
+
+    public synchronized void updateBool(boolean bool) {
         this.bool = bool;
+    }
+
+    @Override
+    public int compareTo(DataStore dataStore) {
+        return (int) (dataStore.getDate().getTime() - this.getDate().getTime());
     }
 }

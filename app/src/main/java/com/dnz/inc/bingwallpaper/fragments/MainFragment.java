@@ -32,6 +32,8 @@ import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.TimeUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 
@@ -42,19 +44,18 @@ public class MainFragment extends Fragment {
     private static final String TAG = "MainFragment";
     public ArrayList<DataStore> dataList;
     public RecyclerAdapterForMainFragment adapter;
-    public RecyclerView recyclerView;
+    private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private View mContainer;
+    private final String r_code = "bla_bla";
 
     public static ConstraintLayout notificationBar;
 
     public static Bundle liveData;
     public ProgressBar progressBar;
 
-    public static MainFragment instance;
-    public MainFragment() {
+    private static MainFragment instance;
 
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,7 +89,7 @@ public class MainFragment extends Fragment {
         super.onStart();
         instance = this;
 
-        if (liveData == null){
+        if (liveData == null) {
             createRecyclerView();
         }
     }
@@ -102,6 +103,47 @@ public class MainFragment extends Fragment {
     public void onPause() {
         super.onPause();
         liveData = new Bundle();
+    }
+
+    /**
+     * Notifies main thread that a new data item has been added to RecyclerView.adapter.<br><br>
+     * To be called called form worker thread.
+     *
+     * @param dataStore   dataitem.
+     * @param requestCode source identifier.
+     */
+    public synchronized static void addDataToRecyclerView(DataStore dataStore, String requestCode) {
+
+        if (instance != null && requestCode.equals(instance.r_code)) {
+            instance.dataList.add(dataStore);
+            long date = dataStore.getDate().getTime();
+            final int position = instance.sortData(date);
+
+            instance.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    instance.adapter.insertItem(position);
+                    instance.recyclerView.scrollToPosition(0);
+                }
+            });
+        }
+    }
+
+    /**
+     * Sorts the dataList for correct UI positioning. Then finds corresponding adapter position.
+     *
+     * @param date date(epoch) for search in dataList< DataStore >
+     * @return the position of dataStore with date matching @param date
+     */
+    private int sortData(long date) {
+
+        Collections.sort(dataList);
+        for (int i = 0; i < dataList.size(); i++) {
+            if (date == dataList.get(i).getDate().getTime()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private class MyAsyncTask extends AsyncTask<Void, Void, Void> {
