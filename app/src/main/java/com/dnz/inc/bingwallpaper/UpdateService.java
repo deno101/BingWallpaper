@@ -45,9 +45,18 @@ public class UpdateService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         int returnCode = super.onStartCommand(intent, flags, startId);
 
+        String s;
+        if (intent != null && ( s = intent.getStringExtra("from"))!= null &&
+                s.equals(UpdateWorker.class.getName())){
+            String x  = TimeUtils.getCustomFormat(new Date(), "hh:mm aa");
+            FileUtils.writeToSharedPreferences(this, CONFIG_FILE, "test", x);
+        }
+
         if (isRunning) {
+            Notification.showNotification(Notification.SUCCESS, "Update Service already running");
             return returnCode;
         }
+
         String from = null;
 
         if (intent != null) {
@@ -141,20 +150,5 @@ public class UpdateService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isRunning = false;
-    }
-
-    public void setAlarm() {
-        Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
-        intent.putExtra("from", "alarmManger");
-
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 1);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 }

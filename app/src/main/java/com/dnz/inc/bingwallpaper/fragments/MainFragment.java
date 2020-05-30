@@ -17,6 +17,12 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,16 +31,21 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.dnz.inc.bingwallpaper.R;
+import com.dnz.inc.bingwallpaper.UpdateWorker;
 import com.dnz.inc.bingwallpaper.db.ContractSchema;
 import com.dnz.inc.bingwallpaper.db.DBHelper;
 import com.dnz.inc.bingwallpaper.utils.DataStore;
 import com.dnz.inc.bingwallpaper.utils.FileUtils;
 import com.dnz.inc.bingwallpaper.utils.TimeUtils;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -220,16 +231,59 @@ public class MainFragment extends Fragment {
             return null;
         }
 
+        /**
+         * Check if attempt to start service using WorkMananager
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (getActivity() != null) {
-                Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
-                intent.setPackage(getActivity().getPackageName());
-                try {
-                    getActivity().startService(intent);
+            if (getContext() != null) {
+                WorkManager manager = WorkManager.getInstance(getContext());
 
-                } catch (IllegalStateException e) {
+                boolean running = false;
+                boolean enqueued = false;
+                try {
+                    List<WorkInfo> info = manager.getWorkInfosByTag(UpdateWorker.WORKER_TAG).get();
+
+                    for (WorkInfo workInfo : info) {
+                        enqueued = enqueued | workInfo.getState() == WorkInfo.State.ENQUEUED;
+                        running = running | workInfo.getState() == WorkInfo.State.RUNNING;
+                    }
+                } catch (ExecutionException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                Constraints constraints = new Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .setRequiresBatteryNotLow(true)
+                        .build();
+
+                if (!running && !enqueued) {
+                    Intent intent = new Intent();
+                    intent.setAction("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
+                    intent.setPackage(getContext().getPackageName());
+                    try {
+                        getContext().startService(intent);
+
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    }
+
+                    PeriodicWorkRequest workRequest = new PeriodicWorkRequest
+                            .Builder(UpdateWorker.class, 20, TimeUnit.MINUTES)
+                            .addTag(UpdateWorker.WORKER_TAG)
+                            .setConstraints(constraints)
+                            .build();
+
+                    manager.enqueue(workRequest);
+
+                } else if (!running && enqueued) {
+                    OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest
+                            .Builder(UpdateWorker.class)
+                            .build();
+
+                    manager.enqueue(oneTimeWorkRequest);
                 }
             }
         }

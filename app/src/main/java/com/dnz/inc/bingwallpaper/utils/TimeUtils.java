@@ -25,6 +25,10 @@ public class TimeUtils {
         return date1;
     }
 
+    public static String getCustomFormat(Date date, String format) {
+        return new SimpleDateFormat(format, Locale.getDefault()).format(date);
+    }
+
     public static String forDisplay(Date date) {
         Calendar today = Calendar.getInstance();
         Calendar yesterday = Calendar.getInstance();
@@ -53,7 +57,7 @@ public class TimeUtils {
                 && calendar.get(Calendar.DAY_OF_MONTH) == calenderDate.get(Calendar.DAY_OF_MONTH);
     }
 
-    public static Calendar getTimeAsOfMidnight(){
+    public static Calendar getTimeAsOfMidnight() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(
                 calendar.get(Calendar.YEAR),

@@ -61,26 +61,8 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
             ft.add(R.id.fragment_container, mainFragment)
                     .commit();
         }
-
-        setAlarm();
     }
 
-    private void setAlarm() {
-        Intent intent = new Intent("com.dnz.inc.bingwallpaper.UPDATE_SERVICE");
-        intent.putExtra("from", UpdateService.class.getName());
-
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Log.d(TAG, "setAlarm: pending intent" + pendingIntent.toString());
-
-        Calendar calendar = Calendar.getInstance();
-        // TODO: 5/29/20 change back after test 
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, pendingIntent);
-    }
 
     @Override
     public void startImageFragment(Bitmap image, String copyright, String title, String date) {
