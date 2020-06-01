@@ -64,17 +64,11 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
     private boolean isFavorite;
 
     private DataStore dataStore;
+    private MainFragment sourceInstance;
 
-
-    public ImageFragment(Bitmap bitmap, String copyright, String title, String date) {
-        this.bitmap = bitmap;
-        this.copyright = copyright;
-        this.title = title;
-        this.date = date;
-    }
-
-    public ImageFragment(DataStore dataStore) {
+    public ImageFragment(DataStore dataStore, MainFragment sourceInstance) {
         this.dataStore = dataStore;
+        this.sourceInstance = sourceInstance;
     }
 
     @Override
@@ -162,20 +156,27 @@ public class ImageFragment extends Fragment implements View.OnClickListener, Rec
                 break;
 
             case R.id.image_view_like:
-                // TODO: 5/27/20 set amination drawable
-                if (isFavorite) {
+                if (dataStore.getBool()) {
                     likeView.setImageResource(R.drawable.ic_heart_paths);
-                    isFavorite = false;
+                    dataStore.updateBool(false);
+
                 } else {
                     likeView.setImageResource(R.drawable.ic_heart_red);
-                    isFavorite = true;
+                    dataStore.updateBool(true);
+
                 }
                 break;
             case R.id.image_view_delete:
-                MainActivity.db_conn.deleteEntry_byDate(date);
-                getFragmentManager().popBackStack();
+                MainActivity.db_conn.deleteEntry_byID(dataStore.get_id());
+
+                File target = new File(getActivity().getFilesDir(), TimeUtils.forDB_JSON_FS(dataStore.getDate()) + ".jpg");
+                if (!FileUtils.deleteFile(target)) {
+                    Toast.makeText(getContext(), "Error unable to delete file", Toast.LENGTH_SHORT).show();
+                }
+                sourceInstance.dataList.remove(dataStore);
 
                 MainFragment.liveData = null;
+                getFragmentManager().popBackStack();
                 break;
             case R.id.image_view_save:
                 if (Permissions.checkStoragePermission(getActivity())) {

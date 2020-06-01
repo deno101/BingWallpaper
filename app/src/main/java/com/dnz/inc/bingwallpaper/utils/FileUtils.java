@@ -72,4 +72,8 @@ public class FileUtils {
         editor.putString(key, value);
         editor.apply();
     }
+
+    public static boolean deleteFile(File file) {
+        return file.delete();
+    }
 }

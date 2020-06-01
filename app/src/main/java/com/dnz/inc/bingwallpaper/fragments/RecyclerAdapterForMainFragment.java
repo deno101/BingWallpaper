@@ -140,6 +140,11 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
                 case R.id.delete_card:
                     shrinkMenu();
                     MainActivity.db_conn.deleteEntry_byID(data.get_id());
+                    File target = new File(mainFragment.getActivity().getFilesDir(), TimeUtils.forDB_JSON_FS(data.getDate()) + ".jpg");
+                    if (!FileUtils.deleteFile(target)){
+                        Toast.makeText(mainFragment.getContext(), "Error unable to delete file", Toast.LENGTH_SHORT).show();
+                    }
+
                     mainFragment.dataList.remove(position);
 
                     notifyItemRemoved(position);
@@ -147,7 +152,7 @@ public class RecyclerAdapterForMainFragment extends RecyclerView.Adapter<Recycle
 
                 case R.id.image_view_for_main_fragment:
 
-                    ImageFragment imageFragment = new ImageFragment(mainFragment.dataList.get(position));
+                    ImageFragment imageFragment = new ImageFragment(mainFragment.dataList.get(position), mainFragment);
                     mainFragment.getFragmentManager().
                             beginTransaction().
                             setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.enter, R.anim.exit).

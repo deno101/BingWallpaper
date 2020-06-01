@@ -29,7 +29,7 @@ import com.dnz.inc.bingwallpaper.utils.Permissions;
 
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements CallBacks.StartFragment {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private Fragment mainFragment, displayImageFragment;
 
@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startFragment = this;
         db_conn = new DBHelper(this);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -63,22 +62,6 @@ public class MainActivity extends AppCompatActivity implements CallBacks.StartFr
         }
     }
 
-
-    @Override
-    public void startImageFragment(Bitmap image, String copyright, String title, String date) {
-        displayImageFragment = new ImageFragment(image, copyright, title, date);
-        try {
-            // TODO: 5/21/20 catch null pointer exception ft (is null)
-
-            ft.replace(R.id.fragment_container, displayImageFragment)
-                    .addToBackStack(null)
-                    .commit();
-        } catch (IllegalStateException | NullPointerException e) {
-            e.printStackTrace();
-            initFT();
-            startImageFragment(image, copyright, title, date);
-        }
-    }
 
     private void initFT() {
         ft = getSupportFragmentManager().beginTransaction();

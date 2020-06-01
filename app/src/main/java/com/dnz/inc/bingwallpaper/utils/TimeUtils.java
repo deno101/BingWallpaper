@@ -10,7 +10,7 @@ public class TimeUtils {
     private static final String TAG = "TimeUtils";
 
     public static String PATTERN_JSON_DB = "yyyyMMdd";
-    public static String PATTERN_DISPLAY = "yyyy-MMM-dd";
+    public static String PATTERN_DISPLAY = "MMM dd, yyyy";
 
     public static double ONE_DAY = 24 * 60 * 60 * 1000;
 
